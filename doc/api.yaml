@@ -1,273 +1,626 @@
 openapi: 3.0.0
-servers:
-  - url: "http://localhost:3000"
+
+###############
+## Meta info ##
+###############
 info:
-  title: Fantastic Coffee (decaffeinated)
-  description: Fantastic Coffee (decaffeinated), the skeleton project for Web and Software architecture course
+  title: WASAPhotoAPI
   version: 1.0.0
+  description: |-
+    API for the WASAPhoto application.
+    The API follows the CRUD philosophy, that maps HTTP methods TK
+
+tags:
+  - name: Authentication
+    description: |-
+      Endpoints that require the user to be logged in.
+      The user must provide just his username in the `Authorization` header.
+  - name: NoAuth
+    description: |-
+      Endpoints that don't require the user to be logged in.
+
+###############
+## Endpoints ##
+###############
 paths:
-  /status:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    get:
-      tags: ["General"]
-      operationId: getStatusMessage
-      summary: Get status message for the user about issues / updates
-      description: |-
-        The response contains a status message meant for the user. It might
-        contains information about current technical issues, update messages
-        or general information.
-      responses:
-        "200":
-          description: Status message available
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StatusInfo"
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /:
+  /me/feed:
     get:
-      tags: ["Group 1"]
-      operationId: index
-      summary: Get an index
-      description: |-
-        This is an example of an index API description
+      operationId: getMyStream
+      summary: Returns a list of posts made by the users the current user is following
+      tags: ['Authentication']
       responses:
-        "200":
-          description: Successful
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-  /context:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
+        '200':
+          $ref: '#/components/responses/MultiUserPost'
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+
+  /me/change-username:
     post:
-      tags: ["Group 1"]
-      operationId: getContext
-      summary: Another API example
+      operationId: setMyUserName
+      summary: Changes the user's username
+      tags: ['Authentication']
       description: |-
-        Example description 2
-      responses:
-        "200":
-          description: Request ok
-          headers:
-            X-Access-Token:
-              description: Access token for authenticated requests
-              schema: { type: string }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-  /authenticated:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    get:
-      tags: ["Group 2"]
-      operationId: getAuthenticatedExample
-      summary: Get an endpoint with authentication
-      description: |-
-        Get an endpoint with auth
-      security:
-        - LegacyAuth: []
-        - AppToken: []
-      responses:
-        "200":
-          description: Logout successful
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /pictures/{cat}:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-      - $ref: "#/components/parameters/cat"
-    get:
-      tags: ["Cat pictures"]
-      operationId: getCatFromPicture
-      summary: Example of a parameter in URL
-      description: |-
-        Example of a parameter in URL
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Student picture found
-          content:
-            image/png:
-              schema:
-                type: string
-                format: binary
-              example: Picture binary file
-        "404":
-          description: Student picture not found
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-
-  /autofeeder/{cat}:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-      - $ref: "#/components/parameters/cat"
-    put:
-      tags: ["Autofeeder"]
-      operationId: createCatAutofeeder
-      summary: Example of PUT operation
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Auto feed enabled
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-    delete:
-      tags: ["Autofeeder"]
-      operationId: deleteCatAutofeeder
-      summary: Example of DELETE operation
-      security:
-        - LegacyAuth: []
-      responses:
-        "200":
-          description: Auto feed disabled
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/InternalServerError" }
-
-  /session/login:
-    parameters:
-      - $ref: "#/components/parameters/XAppBuild"
-      - $ref: "#/components/parameters/XAppVersion"
-      - $ref: "#/components/parameters/XAppLanguage"
-      - $ref: "#/components/parameters/XAppPlatform"
-    post:
-      tags: ["Session management"]
-      operationId: login
-      summary: Log-in into system
-      description: |-
-        Perform a log-in action using username and password credentials.
-        Returns a token which can be used in authenticated requests.
+        Changes the user's username; if the username is already taken an error is returned.
+        The previous username won't be reserved and it will be available for other users for the taking.
       requestBody:
+        description: User details
+        required: true
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
               type: object
               properties:
-                userid:
+                username:
+                  description: The new username
                   type: string
-                  pattern: '^[a-zA-Z0-9]+$'
+                  example: excale
+                  pattern: '[\w\d_-.]+'
                   minLength: 3
-                  maxLength: 255
-                password:
-                  type: string
-                  pattern: '^.*?$'
-                  minLength: 8
-                  maxLength: 255
+                  maxLength: 20
+                  required: true
       responses:
-        "200":
-          description: Login successful
-          headers:
-            X-Access-Token:
-              description: Access token for authenticated requests
-              schema: { type: string }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "403":
-          description: Login failed
-          headers:
-            X-Message:
-              description: Error message
-              schema: { type: string }
-        "500": { $ref: "#/components/responses/InternalServerError" }
+        '200':
+          description: Username changed correctly
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '403':
+          description: The chosen username is already taken
 
+  /me/followed-users:
+    get:
+      operationId: getFollowedUsers
+      summary: Returns a list of users the current user is following
+      tags: ['Authentication']
+      responses:
+        '200':
+          description: List retrieved correctly
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  - type: string
+                    description: A username
+                    example: excale
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+
+  /me/followed-users/{username}:
+    put:
+      operationId: followUser
+      summary: Adds a specified user to the list of followed users.
+      tags: ['Authentication']
+      description: |-
+        Adds a specified user to the list of followed users.
+        If the specified user is already in the list,
+        the response will be as if the specified user wasn't in the list before (i.e. 200).
+      parameters:
+        - $ref: '#/components/parameters/pathUsernameReq'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-Success'
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+    delete:
+      operationId: unfollowUser
+      summary: Removes a user from the list of followed users.
+      tags: ['Authentication']
+      description: |-
+        Removes the specified user from the current user's list of followed users.
+        If the specified user isn't in the list,
+        the response will be as if the specified user has been removed correctly (i.e. 200).
+      parameters:
+        - $ref: '#/components/parameters/pathUsernameReq'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-Success'
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+
+  /me/banned-users:
+    get:
+      operationId: getBannedUsers
+      summary: Returns a list of users the current user has banned
+      tags: ['Authentication']
+      responses:
+        '200':
+          description: List retrieved correctly
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  - type: string
+                    description: A username
+                    example: excale
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+
+  /me/banned-users/{username}:
+    put:
+      operationId: banUser
+      summary: Bans a user from seeing the current user's content.
+      tags: ['Authentication']
+      description: |-
+        Adds the specified user to the current user's list of banned users.
+      responses:
+        '200':
+          $ref: '#/components/responses/200-Success'
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+    delete:
+      operationId: unbanUser
+      summary: Removes a user from the list of banned users.
+      tags: ['Authentication']
+      description: |-
+        Removes the specified user from the list of followed users.
+        If the specified user doesn't belong to the list,
+        the response will be as if the specified user would have been removed correctly (i.e. 200).
+      responses:
+        '200':
+          $ref: '#/components/responses/200-Success'
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{username}:
+    get:
+      operationId: getUserProfile
+      summary: Returns the details about a user's profile
+      tags: ['NoAuth']
+      responses:
+        '200':
+          description: Information retrieved correctly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  displayName:
+                    type: string
+                    description: The user's display name
+                    example: Emanuele Scaccia
+                  username:
+                    type: string
+                    description: The user's username
+                    example: excale
+                  followers:
+                    type: number
+                    description: The number of followers the user has
+                    example: 1450
+                  following:
+                    type: number
+                    description: The number of users the user is following
+                    example: 12
+                  postsNumber:
+                    type: number
+                    description: The number of posts the user has
+                    example: 3
+                  profilePicture:
+                    type: string
+                    description: The URL of the user's profile picture
+                    example: https://api.example.com/v1/users/excale/profile-picture
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{username}/feed:
+    get:
+      operationId: getUserFeed
+      summary: Returns a list of posts made by the user
+      tags: ['NoAuth']
+      responses:
+        '200':
+          $ref: '#/components/responses/MultiUserPost'
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{username}/feed/{post_id}:
+    get:
+      operationId: getUserPost
+      summary: Returns details about a single post made by the user
+      tags: ['NoAuth']
+      responses:
+        '200':
+          $ref: '#/components/responses/MonoUserPost'
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{username}/feed/{post_id}/likes:
+    get:
+      operationId: getUserPostLikes
+      summary: Returns a list of users who liked the post
+      tags: ['NoAuth']
+      responses:
+        '200':
+          description: List of users who liked the post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsernameList'
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+    put:
+      operationId: addUserPostLike
+      summary: Adds a like to the specified post
+      tags: ['Authentication']
+      responses:
+        '200':
+          description: Like added correctly
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+    delete:
+      operationId: removeUserPostLike
+      summary: Remove a like to the specified post
+      tags: ['Authentication']
+      responses:
+        '200':
+          description: Like removed correctly
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{username}/feed/{post_id}/comments:
+    get:
+      operationId: getUserPostComments
+      summary: Returns a list of comments under a post
+      tags: ['NoAuth']
+      responses:
+        '200':
+          description: List of comments under the post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPostComment'
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+    put:
+      operationId: addUserPostLike
+      summary: Adds a like to the specified post
+      tags: ['Authentication']
+      responses:
+        '200':
+          description: Like added correctly
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+    delete:
+      operationId: removeUserPostLike
+      summary: Remove a like to the specified post
+      tags: ['Authentication']
+      responses:
+        '200':
+          description: Like removed correctly
+        '400':
+          $ref: '#/components/responses/400-InvalidRequest'
+        '401':
+          $ref: '#/components/responses/401-LoggedOut'
+        '403':
+          $ref: '#/components/responses/403-ForbiddenBanned'
+        '404':
+          $ref: '#/components/responses/404-ResourceNotFound'
+        '500':
+          $ref: '#/components/responses/500-InternalError'
+
+  /login:
+    post:
+      tags: [ "NoAuth" ]
+      summary: Logs in the user
+      description: |
+        If the user does not exist, it will be created,
+        and an identifier is returned.
+        If the user exists, the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Excale
+                  pattern: 'ˆ[a-zA-Z0-9_-.]$'
+                  minLength: 3
+                  maxLength: 20
+                  required: true
+      responses:
+        '200':
+          description: User log-in action successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                    type: string
+                    example: "Excale"
 
 components:
-  schemas:
-    StatusInfo:
-      title: Status Info
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - info
-            - warning
-            - critical
-            - ""
-        title: { type: string }
-        message: { type: string }
-        url: { type: string }
 
-  responses:
-    Unauthorized:
-      description: The access token is missing or it's expired
-    BadRequest:
-      description: The request was not compliant with the documentation (eg. missing fields, etc)
-    InternalServerError:
-      description: The server encountered an internal error. Further info in server logs
-
-  securitySchemes:
-    LegacyAuth:
-      type: apiKey
-      in: header
-      name: X-App-Token
-      description: |-
-        App session token value. This value is sent by the server in the login
-        and session refresh APIs.
-
+  ##########################
+  ## Parameter components ##
+  ##########################
   parameters:
-    XAppVersion:
-      schema:
-        type: string
-        pattern: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
-        minLength: 1
-        maxLength: 10
-      name: X-App-Version
-      in: header
-      required: true
-      description: App human readable version ("semantic version" format)
-      allowEmptyValue: false
-    XAppBuild:
-      schema: { type: integer }
-      name: X-App-Build
-      in: header
-      required: true
-      description: App build number
-      allowEmptyValue: false
-    XAppLanguage:
-      schema:
-        type: string
-        pattern: '^[a-z]{2}([-_][A-Z]{2})?$'
-        minLength: 2
-        maxLength: 5
-      name: X-App-Language
-      in: header
-      required: true
-      description: App language in ISO 639-1 format
-      allowEmptyValue: false
-    XAppPlatform:
-      schema:
-        type: string
-        enum: [ios, android]
-      name: X-App-Platform
-      in: header
-      required: true
-      description: App operating system / platform
-      allowEmptyValue: false
-    cat:
-      schema:
-        type: string
-        pattern: '^[a-zA-Z]+$'
-        minLength: 3
-        maxLength: 10
-      name: cat
+
+    pathUsernameReq:
+      name: username
       in: path
       required: true
-      description: Cat
-      allowEmptyValue: false
+      description: Username of the target user
+      example: excale
+
+  #######################
+  ## Schema components ##
+  #######################
+  schemas:
+
+    UsernameList:
+      type: array
+      description: A list of usernames
+      items:
+        type: string
+        description: A username
+        example: excale
+
+    UserProfile:
+      type: object
+      properties:
+        username:
+          type: string
+          description: The user's username.
+          nullable: false
+          example: excale
+        displayName:
+          type: string
+          description: The user's display name.
+          nullable: false
+          example: Emanuele Scaccia
+        urlProfilePicture:
+          type: string
+          description: |-
+            URL of the user's profile picture.
+            Note: all photos are encoded with webp format.
+            Generally, the url will be of the form
+            `https://api.example.com/v1/users/{username}/assets/{photo_id}.webp`
+          nullable: false
+          example: https://api.example.com/v1/users/excale/assets/3e270f31-6eaa-4418-ab97-7ed22f51d446.webp
+        nPosts:
+          type: number
+          description: The number of posts the user has
+          nullable: false
+          minimum: 0
+          example: 4
+        nFollowers:
+          type: number
+          description: The number of followers the user has
+          nullable: false
+          minimum: 0
+          example: 123
+        nFollowing:
+          type: number
+          description: The number of users the user is following
+          nullable: false
+          minimum: 0
+          example: 1234
+
+    UserPost:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The uuid of the post.
+          nullable: false
+          example: 3e270f31-6eaa-4418-ab97-7ed22f51d446
+        username:
+          type: string
+          description: The username of the user who made the post.
+          nullable: false
+          example: excale
+        urlPhoto:
+          type: string
+          description: |-
+            The URL of the photo. Note: all photos are encoded with webp format.
+            Generally, the url will be of the form
+            `https://api.example.com/v1/users/{username}/assets/{post_id}.webp`
+          nullable: false
+          example: https://api.example.com/v1/users/excale/assets/3e270f31-6eaa-4418-ab97-7ed22f51d446.webp
+        caption:
+          type: string
+          description: The caption of the post.
+          nullable: true
+          example: A day at the beach...
+        nLikes:
+          type: integer
+          description: The number of likes the post has.
+          example: 123
+          minimum: 0
+          nullable: false
+        nComments:
+          type: integer
+          description: The number of comments the post has.
+          example: 4
+          minimum: 0
+          nullable: false
+        timestamp:
+          type: string
+          description: The timestamp of the post, in `YYYY-MM-DD hh:mm:ss` format.
+          nullable: false
+          example: 2021-01-01T00:00:00.000Z
+
+    UserPostComment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The uuid of the comment.
+          nullable: false
+          example: 3e270f31-6eaa-4418-ab97-7ed22f51d446
+        username:
+          type: string
+          description: The username of the user who added the comment.
+          nullable: false
+          example: excale
+        text:
+          type: string
+          description: The text of the comment.
+          nullable: false
+          example: Nice photo!
+        timestamp:
+          type: string
+          description: The timestamp of the comment, in `YYYY-MM-DD hh:mm:ss` format.
+          nullable: false
+          example: 2021-01-01T00:00:00.000Z
+
+    ResourceNotFoundException:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The message of the error.
+          nullable: true
+          example: Couldn't find a user with the username 'excale'.
+        resourceType:
+          type: string
+          description: The type of the resource that doesn't exist.
+          enum: ["USER", "POST", "COMMENT"]
+          nullable: false
+          example: user
+
+  #########################
+  ## Response components ##
+  #########################
+  responses:
+
+    MonoUserPost:
+      description: A post made by a user.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserPost'
+
+    MultiUserPost:
+      description: A list of posts made by one or more users.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/UserPost'
+
+    MonoComment:
+      description: A comment made by a user under a post.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserPost'
+
+    MultiComment:
+      description: A list of comments made by one or more users under a post.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/UserPost'
+
+    200-Success:
+      description: The operation was successful.
+
+    400-InvalidRequest:
+      description: The request was invalid or malformed (e.g. missing parameter).
+
+    401-LoggedOut:
+      description: The user is not logged in.
+
+    403-Forbidden:
+      description: The user is not allowed to perform the operation.
+
+    403-ForbiddenBanned:
+      description: The user has been banned by the specified user.
+
+    404-ResourceNotFound:
+      description: The specified user doesn't exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResourceNotFoundException'
+
+    500-InternalError:
+      description: An internal error occurred.
