@@ -25,7 +25,7 @@ tags:
 paths:
 
   /me/feed:
-    get:
+    patch:
       operationId: getMyStream
       summary: Returns a list of posts made by the users the current user is following
       tags: ['Authentication']
