@@ -7,14 +7,14 @@ info:
   title: WASAPhotoAPI
   version: 1.0.0
   description: |-
-    API for the WASAPhoto application.
+    API for the WASAPhoto application. <br>
     The API follows the CRUD philosophy, that maps HTTP methods TK
 
 tags:
-  - name: Authentication
+  - name: Authorization
     description: |-
       Endpoints that require the user to be logged in.
-      The user must provide just his username in the `Authorization` header.
+      The user must provide his username in the `Authorization` header.
   - name: NoAuth
     description: |-
       Endpoints that don't require the user to be logged in.
@@ -28,7 +28,7 @@ paths:
     patch:
       operationId: getMyStream
       summary: Returns a list of posts made by the users the current user is following
-      tags: ['Authentication']
+      tags: ['Authorization']
       responses:
         '200':
           $ref: '#/components/responses/MultiUserPost'
@@ -37,30 +37,30 @@ paths:
         '401':
           $ref: '#/components/responses/401-LoggedOut'
 
-  /me/change-username:
+  /me/change_username:
     post:
       operationId: setMyUserName
       summary: Changes the user's username
-      tags: ['Authentication']
+      tags: ['Authorization']
       description: |-
         Changes the user's username; if the username is already taken an error is returned.
         The previous username won't be reserved and it will be available for other users for the taking.
       requestBody:
         description: User details
-        required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - username
               properties:
                 username:
                   description: The new username
                   type: string
                   example: excale
-                  pattern: '[\w\d_-.]+'
+                  pattern: '[\w\d_\-.]+'
                   minLength: 3
                   maxLength: 20
-                  required: true
       responses:
         '200':
           description: Username changed correctly
@@ -71,11 +71,11 @@ paths:
         '403':
           description: The chosen username is already taken
 
-  /me/followed-users:
+  /me/followed_users:
     get:
       operationId: getFollowedUsers
       summary: Returns a list of users the current user is following
-      tags: ['Authentication']
+      tags: ['Authorization']
       responses:
         '200':
           description: List retrieved correctly
@@ -84,25 +84,25 @@ paths:
               schema:
                 type: array
                 items:
-                  - type: string
-                    description: A username
-                    example: excale
+                  type: string
+                  description: A username
+                  example: excale
         '401':
           $ref: '#/components/responses/401-LoggedOut'
         '500':
           $ref: '#/components/responses/500-InternalError'
 
-  /me/followed-users/{username}:
+  /me/followed_users/{username}:
     put:
       operationId: followUser
       summary: Adds a specified user to the list of followed users.
-      tags: ['Authentication']
+      tags: ['Authorization']
       description: |-
         Adds a specified user to the list of followed users.
         If the specified user is already in the list,
         the response will be as if the specified user wasn't in the list before (i.e. 200).
       parameters:
-        - $ref: '#/components/parameters/pathUsernameReq'
+        - $ref: '#/components/parameters/pathUsername'
       responses:
         '200':
           $ref: '#/components/responses/200-Success'
@@ -119,13 +119,13 @@ paths:
     delete:
       operationId: unfollowUser
       summary: Removes a user from the list of followed users.
-      tags: ['Authentication']
+      tags: ['Authorization']
       description: |-
         Removes the specified user from the current user's list of followed users.
         If the specified user isn't in the list,
         the response will be as if the specified user has been removed correctly (i.e. 200).
       parameters:
-        - $ref: '#/components/parameters/pathUsernameReq'
+        - $ref: '#/components/parameters/pathUsername'
       responses:
         '200':
           $ref: '#/components/responses/200-Success'
@@ -138,11 +138,11 @@ paths:
         '500':
           $ref: '#/components/responses/500-InternalError'
 
-  /me/banned-users:
+  /me/banned_users:
     get:
       operationId: getBannedUsers
       summary: Returns a list of users the current user has banned
-      tags: ['Authentication']
+      tags: ['Authorization']
       responses:
         '200':
           description: List retrieved correctly
@@ -151,21 +151,23 @@ paths:
               schema:
                 type: array
                 items:
-                  - type: string
-                    description: A username
-                    example: excale
+                  type: string
+                  description: A username
+                  example: excale
         '401':
           $ref: '#/components/responses/401-LoggedOut'
         '500':
           $ref: '#/components/responses/500-InternalError'
 
-  /me/banned-users/{username}:
+  /me/banned_users/{username}:
     put:
       operationId: banUser
       summary: Bans a user from seeing the current user's content.
-      tags: ['Authentication']
+      tags: ['Authorization']
       description: |-
         Adds the specified user to the current user's list of banned users.
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
       responses:
         '200':
           $ref: '#/components/responses/200-Success'
@@ -180,7 +182,9 @@ paths:
     delete:
       operationId: unbanUser
       summary: Removes a user from the list of banned users.
-      tags: ['Authentication']
+      tags: ['Authorization']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
       description: |-
         Removes the specified user from the list of followed users.
         If the specified user doesn't belong to the list,
@@ -202,6 +206,8 @@ paths:
       operationId: getUserProfile
       summary: Returns the details about a user's profile
       tags: ['NoAuth']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
       responses:
         '200':
           description: Information retrieved correctly
@@ -246,6 +252,8 @@ paths:
       operationId: getUserFeed
       summary: Returns a list of posts made by the user
       tags: ['NoAuth']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
       responses:
         '200':
           $ref: '#/components/responses/MultiUserPost'
@@ -261,6 +269,9 @@ paths:
       operationId: getUserPost
       summary: Returns details about a single post made by the user
       tags: ['NoAuth']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
+        - $ref: '#/components/parameters/pathPostId'
       responses:
         '200':
           $ref: '#/components/responses/MonoUserPost'
@@ -276,6 +287,9 @@ paths:
       operationId: getUserPostLikes
       summary: Returns a list of users who liked the post
       tags: ['NoAuth']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
+        - $ref: '#/components/parameters/pathPostId'
       responses:
         '200':
           description: List of users who liked the post
@@ -292,7 +306,10 @@ paths:
     put:
       operationId: addUserPostLike
       summary: Adds a like to the specified post
-      tags: ['Authentication']
+      tags: ['Authorization']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
+        - $ref: '#/components/parameters/pathPostId'
       responses:
         '200':
           description: Like added correctly
@@ -309,7 +326,10 @@ paths:
     delete:
       operationId: removeUserPostLike
       summary: Remove a like to the specified post
-      tags: ['Authentication']
+      tags: ['Authorization']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
+        - $ref: '#/components/parameters/pathPostId'
       responses:
         '200':
           description: Like removed correctly
@@ -329,6 +349,9 @@ paths:
       operationId: getUserPostComments
       summary: Returns a list of comments under a post
       tags: ['NoAuth']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
+        - $ref: '#/components/parameters/pathPostId'
       responses:
         '200':
           description: List of comments under the post
@@ -345,7 +368,10 @@ paths:
     put:
       operationId: addUserPostLike
       summary: Adds a like to the specified post
-      tags: ['Authentication']
+      tags: ['Authorization']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
+        - $ref: '#/components/parameters/pathPostId'
       responses:
         '200':
           description: Like added correctly
@@ -362,7 +388,10 @@ paths:
     delete:
       operationId: removeUserPostLike
       summary: Remove a like to the specified post
-      tags: ['Authentication']
+      tags: ['Authorization']
+      parameters:
+        - $ref: '#/components/parameters/pathUsername'
+        - $ref: '#/components/parameters/pathPostId'
       responses:
         '200':
           description: Like removed correctly
@@ -392,14 +421,15 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - name
               properties:
                 name:
                   type: string
                   example: Excale
-                  pattern: 'ˆ[a-zA-Z0-9_-.]$'
+                  pattern: '[a-zA-Z0-9_\-.]'
                   minLength: 3
                   maxLength: 20
-                  required: true
       responses:
         '200':
           description: User log-in action successful
@@ -419,12 +449,19 @@ components:
   ##########################
   parameters:
 
-    pathUsernameReq:
+    pathUsername:
       name: username
       in: path
       required: true
       description: Username of the target user
       example: excale
+
+    pathPostId:
+      name: post_id
+      in: path
+      required: true
+      description: ID of the target post
+      example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
 
   #######################
   ## Schema components ##
