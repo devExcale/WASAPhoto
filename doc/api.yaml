@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 
 ###############
 ## Meta info ##
@@ -44,7 +44,7 @@ paths:
       tags: ['Authorization']
       description: |-
         Changes the user's username; if the username is already taken an error is returned.
-        The previous username won't be reserved and it will be available for other users for the taking.
+        The previous username won't be reserved and it will be available to other users for the taking.
       requestBody:
         description: User details
         content:
@@ -55,12 +55,7 @@ paths:
                 - username
               properties:
                 username:
-                  description: The new username
-                  type: string
-                  example: excale
-                  pattern: '[\w\d_\-.]+'
-                  minLength: 3
-                  maxLength: 20
+                  $ref: '#/components/schemas/Username'
       responses:
         '200':
           description: Username changed correctly
@@ -82,11 +77,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
-                  description: A username
-                  example: excale
+                $ref: '#/components/schemas/UsernameList'
         '401':
           $ref: '#/components/responses/401-LoggedOut'
         '500':
@@ -149,11 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
-                  description: A username
-                  example: excale
+                $ref: '#/components/schemas/UsernameList'
         '401':
           $ref: '#/components/responses/401-LoggedOut'
         '500':
@@ -214,32 +201,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  displayName:
-                    type: string
-                    description: The user's display name
-                    example: Emanuele Scaccia
-                  username:
-                    type: string
-                    description: The user's username
-                    example: excale
-                  followers:
-                    type: number
-                    description: The number of followers the user has
-                    example: 1450
-                  following:
-                    type: number
-                    description: The number of users the user is following
-                    example: 12
-                  postsNumber:
-                    type: number
-                    description: The number of posts the user has
-                    example: 3
-                  profilePicture:
-                    type: string
-                    description: The URL of the user's profile picture
-                    example: https://api.example.com/v1/users/excale/profile-picture
+                $ref: '#/components/schemas/UserProfile'
         '403':
           $ref: '#/components/responses/403-ForbiddenBanned'
         '404':
@@ -366,7 +328,7 @@ paths:
         '500':
           $ref: '#/components/responses/500-InternalError'
     put:
-      operationId: addUserPostLike
+      operationId: addUserPostComment
       summary: Adds a like to the specified post
       tags: ['Authorization']
       parameters:
@@ -386,7 +348,7 @@ paths:
         '500':
           $ref: '#/components/responses/500-InternalError'
     delete:
-      operationId: removeUserPostLike
+      operationId: removeUserPostComment
       summary: Remove a like to the specified post
       tags: ['Authorization']
       parameters:
@@ -408,13 +370,12 @@ paths:
 
   /login:
     post:
+      operationId: doLogin
       tags: [ "NoAuth" ]
       summary: Logs in the user
       description: |
-        If the user does not exist, it will be created,
-        and an identifier is returned.
-        If the user exists, the user identifier is returned.
-      operationId: doLogin
+        Logs in the user with the provided username.
+        If the user does not exist, it will be created automatically.
       requestBody:
         description: User details
         content:
@@ -440,7 +401,7 @@ paths:
                 properties:
                   identifier:
                     type: string
-                    example: "Excale"
+                    example: "excale"
 
 components:
 
@@ -455,6 +416,8 @@ components:
       required: true
       description: Username of the target user
       example: excale
+      schema:
+          $ref: '#/components/schemas/Username'
 
     pathPostId:
       name: post_id
@@ -462,58 +425,64 @@ components:
       required: true
       description: ID of the target post
       example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
+      schema:
+          $ref: '#/components/schemas/UUID'
 
   #######################
   ## Schema components ##
   #######################
   schemas:
 
+    UUID:
+      type: string
+      description: A UUID
+      example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
+      format: uuid
+
+    Username:
+      type: string
+      description: A user's username
+      example: excale
+      pattern: '[\w\d_\-.]+'
+      minLength: 3
+      maxLength: 20
+
     UsernameList:
       type: array
       description: A list of usernames
       items:
-        type: string
-        description: A username
-        example: excale
+        $ref: '#/components/schemas/Username'
 
     UserProfile:
       type: object
       properties:
         username:
-          type: string
-          description: The user's username.
-          nullable: false
-          example: excale
-        displayName:
+          $ref: '#/components/schemas/Username'
+        display_name:
           type: string
           description: The user's display name.
-          nullable: false
           example: Emanuele Scaccia
-        urlProfilePicture:
-          type: string
+        url_profile_picture:
+          type: [ 'string', 'null' ]
           description: |-
             URL of the user's profile picture.
             Note: all photos are encoded with webp format.
             Generally, the url will be of the form
             `https://api.example.com/v1/users/{username}/assets/{photo_id}.webp`
-          nullable: false
           example: https://api.example.com/v1/users/excale/assets/3e270f31-6eaa-4418-ab97-7ed22f51d446.webp
-        nPosts:
+        num_posts:
           type: number
           description: The number of posts the user has
-          nullable: false
           minimum: 0
           example: 4
-        nFollowers:
+        num_followers:
           type: number
           description: The number of followers the user has
-          nullable: false
           minimum: 0
           example: 123
-        nFollowing:
+        num_following:
           type: number
           description: The number of users the user is following
-          nullable: false
           minimum: 0
           example: 1234
 
@@ -523,42 +492,35 @@ components:
         id:
           type: string
           description: The uuid of the post.
-          nullable: false
           example: 3e270f31-6eaa-4418-ab97-7ed22f51d446
         username:
           type: string
           description: The username of the user who made the post.
-          nullable: false
           example: excale
-        urlPhoto:
+        url_photo:
           type: string
           description: |-
             The URL of the photo. Note: all photos are encoded with webp format.
             Generally, the url will be of the form
             `https://api.example.com/v1/users/{username}/assets/{post_id}.webp`
-          nullable: false
           example: https://api.example.com/v1/users/excale/assets/3e270f31-6eaa-4418-ab97-7ed22f51d446.webp
         caption:
-          type: string
+          type: [ 'string', 'null' ]
           description: The caption of the post.
-          nullable: true
           example: A day at the beach...
-        nLikes:
+        num_likes:
           type: integer
           description: The number of likes the post has.
           example: 123
           minimum: 0
-          nullable: false
-        nComments:
+        num_comments:
           type: integer
           description: The number of comments the post has.
           example: 4
           minimum: 0
-          nullable: false
         timestamp:
           type: string
           description: The timestamp of the post, in `YYYY-MM-DD hh:mm:ss` format.
-          nullable: false
           example: 2021-01-01T00:00:00.000Z
 
     UserPostComment:
@@ -567,22 +529,18 @@ components:
         id:
           type: string
           description: The uuid of the comment.
-          nullable: false
           example: 3e270f31-6eaa-4418-ab97-7ed22f51d446
         username:
           type: string
           description: The username of the user who added the comment.
-          nullable: false
           example: excale
         text:
           type: string
           description: The text of the comment.
-          nullable: false
           example: Nice photo!
         timestamp:
           type: string
           description: The timestamp of the comment, in `YYYY-MM-DD hh:mm:ss` format.
-          nullable: false
           example: 2021-01-01T00:00:00.000Z
 
     ResourceNotFoundException:
@@ -591,13 +549,11 @@ components:
         message:
           type: string
           description: The message of the error.
-          nullable: true
           example: Couldn't find a user with the username 'excale'.
-        resourceType:
+        type:
           type: string
           description: The type of the resource that doesn't exist.
-          enum: ["USER", "POST", "COMMENT"]
-          nullable: false
+          enum: ["user", "post", "comment"]
           example: user
 
   #########################
