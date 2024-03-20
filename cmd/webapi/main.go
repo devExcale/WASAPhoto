@@ -97,6 +97,16 @@ func run() error {
 		return fmt.Errorf("creating AppDatabase: %w", err)
 	}
 
+	// Get absolute db path
+	fp, err := os.Open(cfg.DB.Filename)
+	if err != nil {
+		logger.WithError(err).Error("error opening SQLite DB file")
+	} else {
+		var info, _ = fp.Stat()
+		print(info.Name())
+	}
+	_ = fp.Close()
+
 	// Start (main) API server
 	logger.Info("initializing API server")
 
@@ -173,7 +183,7 @@ func run() error {
 
 		// Log the status of this shutdown.
 		switch {
-		case sig == syscall.SIGSTOP:
+		case sig == syscall.SIGINT || sig == syscall.SIGTERM:
 			return errors.New("integrity issue caused shutdown")
 		case err != nil:
 			return fmt.Errorf("could not stop server gracefully: %w", err)

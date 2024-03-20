@@ -10,6 +10,10 @@ info:
     API for the WASAPhoto application. <br>
     The API follows the CRUD philosophy, that maps HTTP methods TK
 
+servers:
+  - url: /
+
+
 tags:
   - name: Authorization
     description: |-

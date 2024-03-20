@@ -36,10 +36,33 @@ import (
 	"fmt"
 )
 
-// AppDatabase is the high level interface for the DB
+// AppDatabase is the high level interface for the DB.
 type AppDatabase interface {
-	GetName() (string, error)
-	SetName(name string) error
+
+	// GetUser retrieves the user with the given UUID.
+	GetUser(uuid string) (User, error)
+
+	// SetUser adds or updates a user. No need to provide the UUID for new users.
+	// The object passed as parameter will be updated with the inserted data.
+	SetUser(user *User) error
+
+	// DeleteUser removes the user with the given UUID.
+	DeleteUser(uuid string) error
+
+	// GetPost retrieves the post with the given UUID.
+	GetPost(uuid string) (Post, error)
+
+	// SetPost adds or updates a post. No need to provide the UUID for new posts.
+	// The object passed as parameter will be updated with the inserted data.
+	SetPost(post *Post) error
+
+	// DeletePost removes the post with the given UUID.
+	DeletePost(uuid string) error
+
+	//GetComment(uuid string) (Comment, error)
+	//SetComment(comment *Comment) error
+	//AddLikePost(postUUID, userUUID string) error
+	//RemoveLikePost(postUUID, userUUID string) error
 
 	Ping() error
 }
@@ -56,19 +79,94 @@ func New(db *sql.DB) (AppDatabase, error) {
 	}
 
 	// Check if table exists. If not, the database is empty, and we need to create the structure
-	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
-	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-		_, err = db.Exec(sqlStmt)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+	var err error
+
+	// user table
+	err = createTableIfNotExists(db, `user`, `
+		CREATE TABLE user
+		(
+			uuid         TEXT(36) PRIMARY KEY,
+			username     TEXT(20) NOT NULL UNIQUE,
+			display_name TEXT(40) NOT NULL,
+			picture      TEXT     NULL
+		);`)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
+	// post table
+	err = createTableIfNotExists(db, `post`, `
+		CREATE TABLE post
+		(
+			uuid      TEXT(36) PRIMARY KEY,
+			caption   TEXT,
+			image     BLOB     NOT NULL,
+			timestamp TEXT     NOT NULL DEFAULT current_timestamp,
+			user_uuid TEXT(36) NOT NULL,
+			FOREIGN KEY (user_uuid) REFERENCES user (uuid)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
+		);`)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
+	// post_comment table
+	err = createTableIfNotExists(db, `post_comment`, `
+		CREATE TABLE post_comment
+		(
+			uuid      TEXT(36) PRIMARY KEY,
+			comment   TEXT     NOT NULL,
+			timestamp TEXT     NOT NULL DEFAULT current_timestamp,
+			post_uuid TEXT(36) NOT NULL,
+			user_uuid TEXT(36) NOT NULL,
+			FOREIGN KEY (post_uuid) REFERENCES post (uuid)
+				ON UPDATE CASCADE
+				ON DELETE CASCADE,
+			FOREIGN KEY (user_uuid) REFERENCES user (uuid)
+				ON UPDATE CASCADE
+				ON DELETE CASCADE
+		);`)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
+	// post_like table
+	err = createTableIfNotExists(db, `post_like`, `
+		CREATE TABLE post_like
+		(
+			post_uuid TEXT(36) NOT NULL,
+			user_uuid TEXT(36) NOT NULL,
+			PRIMARY KEY (post_uuid, user_uuid),
+			FOREIGN KEY (post_uuid) REFERENCES post (uuid)
+				ON UPDATE CASCADE
+				ON DELETE CASCADE,
+			FOREIGN KEY (user_uuid) REFERENCES user (uuid)
+				ON UPDATE CASCADE
+				ON DELETE CASCADE
+		);`)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
 	return &appdbimpl{
 		c: db,
 	}, nil
+}
+
+func createTableIfNotExists(conn *sql.DB, tablename, createStmt string) error {
+
+	if conn == nil {
+		return errors.New("missing database connection")
+	}
+
+	err := conn.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name=?", tablename).Scan(&tablename)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		_, err = conn.Exec(createStmt)
+	}
+
+	return err
 }
 
 func (db *appdbimpl) Ping() error {
