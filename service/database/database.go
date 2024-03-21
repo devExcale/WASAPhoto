@@ -39,8 +39,8 @@ import (
 // AppDatabase is the high level interface for the DB.
 type AppDatabase interface {
 
-	// GetUser retrieves the user with the given UUID.
-	GetUser(uuid string) (User, error)
+	// GetUser retrieves the user with the given UUID or Username.
+	GetUser(param string, filterBy int) (User, error)
 
 	// SetUser adds or updates a user. No need to provide the UUID for new users.
 	// The object passed as parameter will be updated with the inserted data.
@@ -82,69 +82,25 @@ func New(db *sql.DB) (AppDatabase, error) {
 	var err error
 
 	// user table
-	err = createTableIfNotExists(db, `user`, `
-		CREATE TABLE user
-		(
-			uuid         TEXT(36) PRIMARY KEY,
-			username     TEXT(20) NOT NULL UNIQUE,
-			display_name TEXT(40) NOT NULL,
-			picture      TEXT     NULL
-		);`)
+	err = createTableIfNotExists(db, `user`, qCreateTableUser)
 	if err != nil {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
 	// post table
-	err = createTableIfNotExists(db, `post`, `
-		CREATE TABLE post
-		(
-			uuid      TEXT(36) PRIMARY KEY,
-			caption   TEXT,
-			image     BLOB     NOT NULL,
-			timestamp TEXT     NOT NULL DEFAULT current_timestamp,
-			user_uuid TEXT(36) NOT NULL,
-			FOREIGN KEY (user_uuid) REFERENCES user (uuid)
-				ON DELETE CASCADE
-				ON UPDATE CASCADE
-		);`)
+	err = createTableIfNotExists(db, `post`, qCreateTablePost)
 	if err != nil {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
 	// post_comment table
-	err = createTableIfNotExists(db, `post_comment`, `
-		CREATE TABLE post_comment
-		(
-			uuid      TEXT(36) PRIMARY KEY,
-			comment   TEXT     NOT NULL,
-			timestamp TEXT     NOT NULL DEFAULT current_timestamp,
-			post_uuid TEXT(36) NOT NULL,
-			user_uuid TEXT(36) NOT NULL,
-			FOREIGN KEY (post_uuid) REFERENCES post (uuid)
-				ON UPDATE CASCADE
-				ON DELETE CASCADE,
-			FOREIGN KEY (user_uuid) REFERENCES user (uuid)
-				ON UPDATE CASCADE
-				ON DELETE CASCADE
-		);`)
+	err = createTableIfNotExists(db, `post_comment`, qCreateTableComment)
 	if err != nil {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
 	// post_like table
-	err = createTableIfNotExists(db, `post_like`, `
-		CREATE TABLE post_like
-		(
-			post_uuid TEXT(36) NOT NULL,
-			user_uuid TEXT(36) NOT NULL,
-			PRIMARY KEY (post_uuid, user_uuid),
-			FOREIGN KEY (post_uuid) REFERENCES post (uuid)
-				ON UPDATE CASCADE
-				ON DELETE CASCADE,
-			FOREIGN KEY (user_uuid) REFERENCES user (uuid)
-				ON UPDATE CASCADE
-				ON DELETE CASCADE
-		);`)
+	err = createTableIfNotExists(db, `post_like`, qCreateTableLike)
 	if err != nil {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}

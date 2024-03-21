@@ -1,11 +1,14 @@
 package database
 
 type User struct {
-	UUID        string
-	Username    string
-	DisplayName string
-	PictureURL  string
-	CreatedAt   string
+	UUID        string `json:"uuid"`
+	Username    string `json:"username"`
+	DisplayName string `json:"display_name"`
+	PictureURL  string `json:"picture_url"`
+	NPosts      int    `json:"num_posts"`
+	NFollowers  int    `json:"num_followers"`
+	NFollowing  int    `json:"num_following"`
+	CreatedAt   string `json:"created_at"`
 }
 
 type Post struct {

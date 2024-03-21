@@ -5,27 +5,34 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-const qSelectUser = `
-	SELECT user_uuid, username, display_name, ts_created
-	FROM user
-	WHERE lower(user_uuid) = lower(?)`
+const (
+	FilterByUUID = iota
+	FilterByUsername
+)
 
-const qUpsertUser = `
-	INSERT INTO user(user_uuid, username, display_name, picture_url, ts_created)
-	VALUES(?, ?, ?, ?, current_timestamp)
-	ON CONFLICT (user_uuid) DO
-	UPDATE
-	SET username = ?, display_name = ?, picture_url = ?`
-
-const qDeleteUser = `
-	DELETE FROM user
-	WHERE lower(user_uuid) = lower(?)`
-
-func (db *appdbimpl) GetUser(uuid string) (User, error) {
+func (db *appdbimpl) GetUser(param string, filterBy int) (User, error) {
 
 	var user = User{}
+	var query string
 
-	err := db.c.QueryRow(qSelectUser, uuid).Scan(&user.UUID, &user.Username, &user.DisplayName, &user.CreatedAt)
+	switch filterBy {
+	case FilterByUUID:
+		query = qSelectUserByUUID
+	case FilterByUsername:
+		query = qSelectUserByUsername
+	default:
+		return user, errors.New("invalid filterBy value")
+	}
+
+	err := db.c.QueryRow(query, param).Scan(
+		&user.UUID,
+		&user.Username,
+		&user.DisplayName,
+		&user.PictureURL,
+		&user.NPosts,
+		&user.NFollowers,
+		&user.NFollowing,
+		&user.CreatedAt)
 
 	return user, err
 }
@@ -48,7 +55,9 @@ func (db *appdbimpl) SetUser(user *User) error {
 		user.UUID = genId.String()
 	}
 
-	_, err := db.c.Exec(qUpsertUser, user.UUID, user.Username, user.DisplayName, user.Username, user.DisplayName)
+	_, err := db.c.Exec(qUpsertUser,
+		user.UUID, user.Username, user.DisplayName, "", // Insert parameters
+		user.Username, user.DisplayName, "") // Update parameters
 
 	return err
 }
