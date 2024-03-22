@@ -12,6 +12,7 @@ info:
   contact:
     name: Emanuele Scaccia
     email: scaccia.2006749@studenti.uniroma1.it
+    url: https://github.com/dev_excale/WASAPhoto
 
 servers:
   - url: /
