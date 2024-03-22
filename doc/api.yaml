@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.0.3
 
 ###############
 ## Meta info ##
@@ -9,19 +9,41 @@ info:
   description: |-
     API for the WASAPhoto application. <br>
     The API follows the CRUD philosophy, that maps HTTP methods TK
+  contact:
+    name: Emanuele Scaccia
+    email: scaccia.2006749@studenti.uniroma1.it
 
 servers:
   - url: /
 
-
 tags:
-  - name: Authorization
+  - name: User
     description: |-
-      Endpoints that require the user to be logged in.
-      The user must provide his username in the `Authorization` header.
-  - name: NoAuth
+      Endpoints that deal with user-related operations.
+      A bearer token is required to access these endpoints.
+  - name: Post
     description: |-
-      Endpoints that don't require the user to be logged in.
+      Endpoints that deal with post-related operations.
+      A bearer token is required to access these endpoints.
+  - name: Comment
+    description: |-
+      Endpoints that deal with comment-related operations.
+      A bearer token is required to access these endpoints.
+  - name: Like
+    description: |-
+      Endpoints that deal with like-related operations.
+      A bearer token is required to access these endpoints.
+  - name: Follow
+    description: |-
+      Endpoints that deal with follow-related operations.
+      A bearer token is required to access these endpoints.
+  - name: Ban
+    description: |-
+      Endpoints that deal with ban-related operations.
+      A bearer token is required to access these endpoints.
+  - name: Session
+    description: |-
+      Endpoints that deal with session-related operations.
 
 ###############
 ## Endpoints ##
@@ -31,24 +53,365 @@ paths:
   /me/feed:
     patch:
       operationId: getMyStream
-      summary: Returns a list of posts made by the users the current user is following
-      tags: ['Authorization']
+      summary: Posts by the followed users
+      description: Returns a list of posts made by the users the current user is following.
+      tags: [ 'Post' ]
       responses:
-        '200':
-          $ref: '#/components/responses/MultiUserPost'
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
+        '200': # OK
+          $ref: '#/components/responses/200-PostList'
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
 
   /me/change_username:
     post:
       operationId: setMyUserName
       summary: Changes the user's username
-      tags: ['Authorization']
       description: |-
         Changes the user's username; if the username is already taken an error is returned.
         The previous username won't be reserved and it will be available to other users for the taking.
+      tags: [ 'User' ]
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+              properties:
+                username:
+                  $ref: '#/components/schemas/Username'
+      responses:
+        '200': # OK
+          description: Username changed correctly
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '409': # Conflict
+          description: The chosen username is already taken
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /me/followed_users:
+    get:
+      operationId: getFollowedUsers
+      summary: Get followed users
+      description: Returns the list of users the current user is following.
+      tags: [ 'Follow' ]
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-UserList'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /me/followed_users/{user_uuid}:
+    put:
+      operationId: followUser
+      summary: Follow a user
+      description: |-
+        Adds a specified user to the list of followed users.
+        If the given user is already in the list,
+        the response will be as if the user wasn't in the list before (i.e. 200).
+      tags: [ 'Follow' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-Success'
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-UserNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+    delete:
+      operationId: unfollowUser
+      summary: Unfollow a user
+      tags: [ 'Follow' ]
+      description: |-
+        Removes the specified user from the current user's list of followed users.
+        If the user doesn't belong to the list,
+        the response will be as if the user has been removed correctly (i.e. 200).
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-Success'
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '404': # Not Found
+          $ref: '#/components/responses/404-UserNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /me/banned_users:
+    get:
+      operationId: getBannedUsers
+      summary: Get banned users
+      description: Returns the list of users the current user has banned
+      tags: [ 'Ban' ]
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-UserList'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /me/banned_users/{user_uuid}:
+    put:
+      operationId: banUser
+      summary: Ban a user
+      description: |-
+        Adds the given user to the current user's list of banned users.
+        The banned user won't be able to see the user's content.
+      tags: [ 'Ban' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-Success'
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '404': # Not Found
+          $ref: '#/components/responses/404-UserNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+    delete:
+      operationId: unbanUser
+      summary: Unban a user
+      description: |-
+        Removes the given user from the list of banned users.
+        If the user doesn't belong to the list,
+        the response will be as if the user would have been removed correctly (i.e. 200).
+      tags: [ 'Ban' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-Success'
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '404': # Not Found
+          $ref: '#/components/responses/404-UserNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{user_uuid}:
+    get:
+      operationId: getUserProfile
+      summary: Get user profile
+      description: Returns the profile of the given user.
+      tags: [ 'User' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-User'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-UserNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{user_uuid}/feed:
+    get:
+      operationId: getUserFeed
+      summary: Get all user's posts
+      description: Returns the list of the posts made by the given user.
+      tags: [ 'Post' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-PostList'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-UserNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{user_uuid}/feed/{post_uuid}:
+    get:
+      operationId: getUserPost
+      summary: Get a user's post
+      description: Returns a given post made by the given user.
+      tags: [ 'Post' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+        - $ref: '#/components/parameters/pathPostUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-Post'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-PostNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{user_uuid}/feed/{post_uuid}/likes:
+    get:
+      operationId: getUserPostLikes
+      summary: Get users who liked a post
+      description: Returns the list of users who liked the given post.
+      tags: [ 'Like' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+        - $ref: '#/components/parameters/pathPostUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-UserList'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-PostNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+    put:
+      operationId: addUserPostLike
+      summary: Like a post
+      description: Adds a like to the given post.
+      tags: [ 'Like' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+        - $ref: '#/components/parameters/pathPostUUID'
+      responses:
+        '200': # OK
+          description: Like added correctly
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-PostNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+    delete:
+      operationId: removeUserPostLike
+      summary: Remove the like from a post
+      description: Removes the user's like from the given post.
+      tags: [ 'Like' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+        - $ref: '#/components/parameters/pathPostUUID'
+      responses:
+        '200': # OK
+          description: Like removed correctly
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-PostNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{user_uuid}/feed/{post_uuid}/comments:
+    get:
+      operationId: getUserPostComments
+      summary: Get a post's comments
+      description: Returns the list of comments made under the given post.
+      tags: [ 'Comment' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+        - $ref: '#/components/parameters/pathPostUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-CommentList'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-PostNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+    put:
+      operationId: addUserPostComment
+      summary: Comment a post
+      description: Adds a comment to the given post.
+      tags: [ 'Comment' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+        - $ref: '#/components/parameters/pathPostUUID'
+      responses:
+        '200': # OK
+          description: Comment added correctly
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-PostNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /users/{user_uuid}/feed/{post_uuid}/comments/{comment_uuid}:
+    delete:
+      operationId: removeUserPostComment
+      summary: Remove a comment
+      description: Removes the given comment from the given post.
+      tags: [ 'Comment' ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+        - $ref: '#/components/parameters/pathPostUUID'
+        - $ref: '#/components/parameters/pathCommentUUID'
+      responses:
+        '200': # OK
+          description: Comment removed correctly
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-CommentNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /login:
+    post:
+      operationId: doLogin
+      summary: Logs in the user
+      description: |
+        Logs in the user with the provided username.
+        If the user does not exist, it will be created automatically.
+      tags: [ 'Session' ]
       requestBody:
         description: User details
         content:
@@ -62,350 +425,16 @@ paths:
                   $ref: '#/components/schemas/Username'
       responses:
         '200':
-          description: Username changed correctly
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '403':
-          description: The chosen username is already taken
-
-  /me/followed_users:
-    get:
-      operationId: getFollowedUsers
-      summary: Returns a list of users the current user is following
-      tags: ['Authorization']
-      responses:
-        '200':
-          description: List retrieved correctly
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UsernameList'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-
-  /me/followed_users/{username}:
-    put:
-      operationId: followUser
-      summary: Adds a specified user to the list of followed users.
-      tags: ['Authorization']
-      description: |-
-        Adds a specified user to the list of followed users.
-        If the specified user is already in the list,
-        the response will be as if the specified user wasn't in the list before (i.e. 200).
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-Success'
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-    delete:
-      operationId: unfollowUser
-      summary: Removes a user from the list of followed users.
-      tags: ['Authorization']
-      description: |-
-        Removes the specified user from the current user's list of followed users.
-        If the specified user isn't in the list,
-        the response will be as if the specified user has been removed correctly (i.e. 200).
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-Success'
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-
-  /me/banned_users:
-    get:
-      operationId: getBannedUsers
-      summary: Returns a list of users the current user has banned
-      tags: ['Authorization']
-      responses:
-        '200':
-          description: List retrieved correctly
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UsernameList'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-
-  /me/banned_users/{username}:
-    put:
-      operationId: banUser
-      summary: Bans a user from seeing the current user's content.
-      tags: ['Authorization']
-      description: |-
-        Adds the specified user to the current user's list of banned users.
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-      responses:
-        '200':
-          $ref: '#/components/responses/200-Success'
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-    delete:
-      operationId: unbanUser
-      summary: Removes a user from the list of banned users.
-      tags: ['Authorization']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-      description: |-
-        Removes the specified user from the list of followed users.
-        If the specified user doesn't belong to the list,
-        the response will be as if the specified user would have been removed correctly (i.e. 200).
-      responses:
-        '200':
-          $ref: '#/components/responses/200-Success'
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-
-  /users/{username}:
-    get:
-      operationId: getUserProfile
-      summary: Returns the details about a user's profile
-      tags: ['NoAuth']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-      responses:
-        '200':
-          description: Information retrieved correctly
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserProfile'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-
-  /users/{username}/feed:
-    get:
-      operationId: getUserFeed
-      summary: Returns a list of posts made by the user
-      tags: ['NoAuth']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-      responses:
-        '200':
-          $ref: '#/components/responses/MultiUserPost'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-
-  /users/{username}/feed/{post_id}:
-    get:
-      operationId: getUserPost
-      summary: Returns details about a single post made by the user
-      tags: ['NoAuth']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-        - $ref: '#/components/parameters/pathPostId'
-      responses:
-        '200':
-          $ref: '#/components/responses/MonoUserPost'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-
-  /users/{username}/feed/{post_id}/likes:
-    get:
-      operationId: getUserPostLikes
-      summary: Returns a list of users who liked the post
-      tags: ['NoAuth']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-        - $ref: '#/components/parameters/pathPostId'
-      responses:
-        '200':
-          description: List of users who liked the post
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UsernameList'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-    put:
-      operationId: addUserPostLike
-      summary: Adds a like to the specified post
-      tags: ['Authorization']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-        - $ref: '#/components/parameters/pathPostId'
-      responses:
-        '200':
-          description: Like added correctly
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-    delete:
-      operationId: removeUserPostLike
-      summary: Remove a like to the specified post
-      tags: ['Authorization']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-        - $ref: '#/components/parameters/pathPostId'
-      responses:
-        '200':
-          description: Like removed correctly
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-
-  /users/{username}/feed/{post_id}/comments:
-    get:
-      operationId: getUserPostComments
-      summary: Returns a list of comments under a post
-      tags: ['NoAuth']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-        - $ref: '#/components/parameters/pathPostId'
-      responses:
-        '200':
-          description: List of comments under the post
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserPostComment'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-    put:
-      operationId: addUserPostComment
-      summary: Adds a like to the specified post
-      tags: ['Authorization']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-        - $ref: '#/components/parameters/pathPostId'
-      responses:
-        '200':
-          description: Like added correctly
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-    delete:
-      operationId: removeUserPostComment
-      summary: Remove a like to the specified post
-      tags: ['Authorization']
-      parameters:
-        - $ref: '#/components/parameters/pathUsername'
-        - $ref: '#/components/parameters/pathPostId'
-      responses:
-        '200':
-          description: Like removed correctly
-        '400':
-          $ref: '#/components/responses/400-InvalidRequest'
-        '401':
-          $ref: '#/components/responses/401-LoggedOut'
-        '403':
-          $ref: '#/components/responses/403-ForbiddenBanned'
-        '404':
-          $ref: '#/components/responses/404-ResourceNotFound'
-        '500':
-          $ref: '#/components/responses/500-InternalError'
-
-  /login:
-    post:
-      operationId: doLogin
-      tags: [ "NoAuth" ]
-      summary: Logs in the user
-      description: |
-        Logs in the user with the provided username.
-        If the user does not exist, it will be created automatically.
-      requestBody:
-        description: User details
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - name
-              properties:
-                name:
-                  type: string
-                  example: Excale
-                  pattern: '[a-zA-Z0-9_\-.]'
-                  minLength: 3
-                  maxLength: 20
-      responses:
-        '200':
           description: User log-in action successful
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  identifier:
+                  token:
                     type: string
-                    example: "excale"
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
 
 components:
 
@@ -414,20 +443,29 @@ components:
   ##########################
   parameters:
 
-    pathUsername:
-      name: username
+    pathUserUUID:
+      name: user_uuid
       in: path
       required: true
-      description: Username of the target user
-      example: excale
+      description: UUID of the target user
+      example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
       schema:
-          $ref: '#/components/schemas/Username'
+          $ref: '#/components/schemas/UUID'
 
-    pathPostId:
-      name: post_id
+    pathPostUUID:
+      name: post_uuid
       in: path
       required: true
-      description: ID of the target post
+      description: UUID of the target post
+      example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
+      schema:
+          $ref: '#/components/schemas/UUID'
+
+    pathCommentUUID:
+      name: comment_uuid
+      in: path
+      required: true
+      description: UUID of the target comment
       example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
       schema:
           $ref: '#/components/schemas/UUID'
@@ -447,17 +485,11 @@ components:
       type: string
       description: A user's username
       example: excale
-      pattern: '[\w\d_\-.]+'
+      pattern: '[\w\-.]+'
       minLength: 3
       maxLength: 20
 
-    UsernameList:
-      type: array
-      description: A list of usernames
-      items:
-        $ref: '#/components/schemas/Username'
-
-    UserProfile:
+    User:
       type: object
       properties:
         username:
@@ -467,7 +499,8 @@ components:
           description: The user's display name.
           example: Emanuele Scaccia
         url_profile_picture:
-          type: [ 'string', 'null' ]
+          type: string
+          nullable: true
           description: |-
             URL of the user's profile picture.
             Note: all photos are encoded with webp format.
@@ -490,13 +523,17 @@ components:
           minimum: 0
           example: 1234
 
-    UserPost:
+    UserList:
+      type: array
+      description: A list of users
+      items:
+        $ref: '#/components/schemas/User'
+
+    Post:
       type: object
       properties:
-        id:
-          type: string
-          description: The uuid of the post.
-          example: 3e270f31-6eaa-4418-ab97-7ed22f51d446
+        uuid:
+          $ref: '#/components/schemas/UUID'
         username:
           type: string
           description: The username of the user who made the post.
@@ -509,7 +546,8 @@ components:
             `https://api.example.com/v1/users/{username}/assets/{post_id}.webp`
           example: https://api.example.com/v1/users/excale/assets/3e270f31-6eaa-4418-ab97-7ed22f51d446.webp
         caption:
-          type: [ 'string', 'null' ]
+          type: string
+          nullable: true
           description: The caption of the post.
           example: A day at the beach...
         num_likes:
@@ -527,13 +565,17 @@ components:
           description: The timestamp of the post, in `YYYY-MM-DD hh:mm:ss` format.
           example: 2021-01-01T00:00:00.000Z
 
-    UserPostComment:
+    PostList:
+      type: array
+      description: A list of posts
+      items:
+        $ref: '#/components/schemas/Post'
+
+    Comment:
       type: object
       properties:
-        id:
-          type: string
-          description: The uuid of the comment.
-          example: 3e270f31-6eaa-4418-ab97-7ed22f51d446
+        uuid:
+          $ref: '#/components/schemas/UUID'
         username:
           type: string
           description: The username of the user who added the comment.
@@ -547,77 +589,78 @@ components:
           description: The timestamp of the comment, in `YYYY-MM-DD hh:mm:ss` format.
           example: 2021-01-01T00:00:00.000Z
 
-    ResourceNotFoundException:
-      type: object
-      properties:
-        message:
-          type: string
-          description: The message of the error.
-          example: Couldn't find a user with the username 'excale'.
-        type:
-          type: string
-          description: The type of the resource that doesn't exist.
-          enum: ["user", "post", "comment"]
-          example: user
+    CommentList:
+      type: array
+      description: A list of comments
+      items:
+        $ref: '#/components/schemas/Comment'
 
   #########################
   ## Response components ##
   #########################
   responses:
 
-    MonoUserPost:
-      description: A post made by a user.
+    200-User:
+      description: User retrieved correctly.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UserPost'
+            $ref: '#/components/schemas/User'
 
-    MultiUserPost:
-      description: A list of posts made by one or more users.
+    200-UserList:
+      description: List retrieved correctly.
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/UserPost'
+            $ref: '#/components/schemas/UserList'
 
-    MonoComment:
-      description: A comment made by a user under a post.
+    200-Post:
+      description: Post retrieved correctly.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UserPost'
+            $ref: '#/components/schemas/Post'
 
-    MultiComment:
-      description: A list of comments made by one or more users under a post.
+    200-PostList:
+      description: List retrieved correctly.
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/UserPost'
+            $ref: '#/components/schemas/PostList'
+
+    200-CommentList:
+      description: List retrieved correctly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CommentList'
 
     200-Success:
       description: The operation was successful.
 
-    400-InvalidRequest:
+    400-BadRequest:
       description: The request was invalid or malformed (e.g. missing parameter).
 
-    401-LoggedOut:
+    401-Unauthorized:
       description: The user is not logged in.
 
     403-Forbidden:
       description: The user is not allowed to perform the operation.
 
-    403-ForbiddenBanned:
-      description: The user has been banned by the specified user.
+    403-Banned:
+      description: The user has been banned by the given user.
 
-    404-ResourceNotFound:
+    404-UserNotFound:
       description: The specified user doesn't exist.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ResourceNotFoundException'
+
+    404-PostNotFound:
+      description: The specified post doesn't exist.
+
+    404-CommentNotFound:
+      description: The specified comment doesn't exist.
+
+    409-Conflict:
+      description: The operation couldn't be completed due to a conflict.
 
     500-InternalError:
       description: An internal error occurred.
