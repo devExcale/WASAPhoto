@@ -56,3 +56,33 @@ var qCreateTableLike = `
 			ON DELETE CASCADE
 	);
 `
+
+var qCreateTableFollowedUsers = `
+	CREATE TABLE user_followed
+	(
+		follower_uuid TEXT(36) NOT NULL,
+		followed_uuid TEXT(36) NOT NULL,
+		PRIMARY KEY (follower_uuid, followed_uuid),
+		FOREIGN KEY (follower_uuid) REFERENCES user (user_uuid)
+			ON UPDATE CASCADE
+			ON DELETE CASCADE,
+		FOREIGN KEY (followed_uuid) REFERENCES user (user_uuid)
+			ON UPDATE CASCADE
+			ON DELETE CASCADE
+	);
+`
+
+var qCreateTableBannedUsers = `
+	CREATE TABLE user_banned
+	(
+		issuer_uuid TEXT(36) NOT NULL,
+		banned_uuid TEXT(36) NOT NULL,
+		PRIMARY KEY (issuer_uuid, banned_uuid),
+		FOREIGN KEY (issuer_uuid) REFERENCES user (user_uuid)
+			ON UPDATE CASCADE
+			ON DELETE CASCADE,
+		FOREIGN KEY (banned_uuid) REFERENCES user (user_uuid)
+			ON UPDATE CASCADE
+			ON DELETE CASCADE
+	);
+`

@@ -88,22 +88,28 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, _ httprouter.
 
 }
 
-// getAuthorization returns the authorization token from the request
-func getAuthorization(r *http.Request) string {
+// getAuthorizedUser returns the authorization token from the request
+func (rt *_router) getAuthorizedUser(r *http.Request) *database.User {
 
 	// Get token
 	var token = r.Header.Get("Authorization")
 	token = strings.TrimPrefix(token, "Bearer ")
 	if token == "" {
-		return ""
+		return nil
 	}
 
 	// Decode token
-	var obj, err = base64.StdEncoding.DecodeString(token)
+	var uuidByte, err = base64.StdEncoding.DecodeString(token)
 	if err != nil {
-		return ""
+		return nil
 	}
 
-	return string(obj)
+	// Get user
+	var user database.User
+	user, err = rt.db.GetUser(string(uuidByte), database.FilterByUUID)
+	if err != nil {
+		return nil
+	}
 
+	return &user
 }

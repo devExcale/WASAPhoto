@@ -11,68 +11,47 @@ import (
 	"net/http"
 )
 
-func (rt *_router) getUser(w http.ResponseWriter, _ *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	w.Header().Set("content-type", "application/json")
-
-	// Get request parameters
-	var uuid = ps.ByName("uuid")
-
-	// Check if the uuid is empty
-	if uuid == "" {
-		httpSimpleResponse(http.StatusBadRequest, []byte("uuid is required"), w, ctx)
-		return
-	}
-
-	// Find requested user
-	var user, err = rt.db.GetUser(uuid, database.FilterByUUID)
-	if errors.Is(err, sql.ErrNoRows) {
-
-		// User not found
-		httpSimpleResponse(http.StatusNotFound, []byte("user not found"), w, ctx)
-		return
-
-	} else if err != nil {
-
-		// Generic error
-		ctx.Logger.WithError(err).Error("cannot get user")
-		httpSimpleResponse(http.StatusInternalServerError, []byte("internal server error"), w, ctx)
-		return
-
-	}
-
-	var response []byte
-	response, err = json.Marshal(user)
-	if err != nil {
-
-		// Error while marshalling the user
-		ctx.Logger.WithError(err).Error("cannot marshal user")
-		httpSimpleResponse(http.StatusInternalServerError, []byte("internal server error"), w, ctx)
-		return
-	}
-
-	// Write the response
-	httpSimpleResponse(http.StatusOK, response, w, ctx)
-}
-
-func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization
-	var userUUID = getAuthorization(r)
-	if userUUID == "" {
-
+	var loggedUser = rt.getAuthorizedUser(r)
+	if loggedUser == nil {
 		// Token not provided or invalid
 		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// Get request parameters
+	var userUUID = ps.ByName("userUUID")
+
+	// Check if the userUUID is empty
+	if userUUID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Check bans
+	var isBanned, err = rt.db.GetBan(loggedUser.UUID, userUUID)
+	if err != nil {
+
+		ctx.Logger.WithError(err).Error("cannot check ban")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	} else if isBanned {
+
+		w.WriteHeader(http.StatusForbidden)
 		return
 
 	}
 
-	// Find the logged in user
-	var user, err = rt.db.GetUser(userUUID, database.FilterByUUID)
+	// Find requested user
+	searchedUsed, err := rt.db.GetUser(userUUID, database.FilterByUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
-		// User doesn't exist
-		w.WriteHeader(http.StatusUnauthorized)
+		// User not found
+		w.WriteHeader(http.StatusNotFound)
 		return
 
 	} else if err != nil {
@@ -84,11 +63,38 @@ func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, _ http
 
 	}
 
+	var response []byte
+	response, err = json.Marshal(searchedUsed)
+	if err != nil {
+
+		// Error while marshalling the searchedUsed
+		ctx.Logger.WithError(err).Error("cannot marshal user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Write the response
+	httpSimpleResponse(http.StatusOK, response, w, ctx)
+}
+
+func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {
+	w.Header().Set("content-type", "application/json")
+
+	// Check authorization
+	var user = rt.getAuthorizedUser(r)
+	if user == nil {
+
+		// Token not provided or invalid
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+
+	}
+
 	// Parse request body
 	var body struct {
 		Username string `json:"username"`
 	}
-	err = json.NewDecoder(r.Body).Decode(&body)
+	var err = json.NewDecoder(r.Body).Decode(&body)
 
 	// Cannot parse body
 	if err != nil {
@@ -127,7 +133,7 @@ func (rt *_router) changeUsername(w http.ResponseWriter, r *http.Request, _ http
 
 	// Update the username
 	user.Username = newUsername
-	err = rt.db.SetUser(&user)
+	err = rt.db.SetUser(user)
 
 	if err != nil {
 

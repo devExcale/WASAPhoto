@@ -59,6 +59,15 @@ type AppDatabase interface {
 	// DeletePost removes the post with the given UUID.
 	DeletePost(uuid string) error
 
+	// GetBan checks if a user is banned by another user.
+	GetBan(issuerUUID, bannedUUID string) (bool, error)
+
+	// AddBan bans a user from seeing another user's content.
+	AddBan(issuerUUID, bannedUUID string) error
+
+	// DeleteBan lifts a ban.
+	DeleteBan(issuerUUID, bannedUUID string) error
+
 	//GetComment(uuid string) (Comment, error)
 	//SetComment(comment *Comment) error
 	//AddLikePost(postUUID, userUUID string) error
@@ -74,6 +83,7 @@ type appdbimpl struct {
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
 // `db` is required - an error will be returned if `db` is `nil`.
 func New(db *sql.DB) (AppDatabase, error) {
+
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
@@ -105,9 +115,19 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	return &appdbimpl{
-		c: db,
-	}, nil
+	// user_followed table
+	err = createTableIfNotExists(db, `user_followed`, qCreateTableFollowedUsers)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
+	// user_banned table
+	err = createTableIfNotExists(db, `user_banned`, qCreateTableBannedUsers)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
+	return &appdbimpl{c: db}, nil
 }
 
 func createTableIfNotExists(conn *sql.DB, tablename, createStmt string) error {
