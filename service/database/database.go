@@ -39,8 +39,11 @@ import (
 // AppDatabase is the high level interface for the DB.
 type AppDatabase interface {
 
-	// GetUser retrieves the user with the given UUID or Username.
-	GetUser(param string, filterBy int) (User, error)
+	// GetUserFull retrieves all user information with the given UUID or Username.
+	GetUserFull(param string, filterBy int) (User, error)
+
+	// GetUserBasic retrieves minimal user information with the given UUID.
+	GetUserBasic(uuid string) (User, error)
 
 	// SetUser adds or updates a user. No need to provide the UUID for new users.
 	// The object passed as parameter will be updated with the inserted data.
@@ -59,8 +62,8 @@ type AppDatabase interface {
 	// DeletePost removes the post with the given UUID.
 	DeletePost(uuid string) error
 
-	// GetBan checks if a user is banned by another user.
-	GetBan(issuerUUID, bannedUUID string) (bool, error)
+	// IsBanned checks if a user is banned by another user.
+	IsBanned(issuerUUID, bannedUUID string) (bool, error)
 
 	// AddBan bans a user from seeing another user's content.
 	AddBan(issuerUUID, bannedUUID string) error
@@ -127,6 +130,12 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
+	// user_full view
+	err = createTableIfNotExists(db, `user_full`, qCreateViewUserFull)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
+	}
+
 	return &appdbimpl{c: db}, nil
 }
 
@@ -136,7 +145,9 @@ func createTableIfNotExists(conn *sql.DB, tablename, createStmt string) error {
 		return errors.New("missing database connection")
 	}
 
-	err := conn.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name=?", tablename).Scan(&tablename)
+	const qCheckTable = `SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name=?`
+
+	err := conn.QueryRow(qCheckTable, tablename).Scan(&tablename)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		_, err = conn.Exec(createStmt)

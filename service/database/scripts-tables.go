@@ -1,6 +1,6 @@
 package database
 
-var qCreateTableUser = `
+const qCreateTableUser = `
 	CREATE TABLE user
 	(
 		user_uuid    TEXT(36) PRIMARY KEY,
@@ -11,7 +11,7 @@ var qCreateTableUser = `
 	);
 `
 
-var qCreateTablePost = `
+const qCreateTablePost = `
 	CREATE TABLE post
 	(
 		post_uuid   TEXT(36) PRIMARY KEY,
@@ -25,7 +25,7 @@ var qCreateTablePost = `
 	);
 `
 
-var qCreateTableComment = `
+const qCreateTableComment = `
 	CREATE TABLE post_comment
 	(
 		comment_uuid TEXT(36) PRIMARY KEY,
@@ -42,7 +42,7 @@ var qCreateTableComment = `
 	);
 `
 
-var qCreateTableLike = `
+const qCreateTableLike = `
 	CREATE TABLE post_like
 	(
 		post_uuid TEXT(36) NOT NULL,
@@ -57,7 +57,7 @@ var qCreateTableLike = `
 	);
 `
 
-var qCreateTableFollowedUsers = `
+const qCreateTableFollowedUsers = `
 	CREATE TABLE user_followed
 	(
 		follower_uuid TEXT(36) NOT NULL,
@@ -72,7 +72,7 @@ var qCreateTableFollowedUsers = `
 	);
 `
 
-var qCreateTableBannedUsers = `
+const qCreateTableBannedUsers = `
 	CREATE TABLE user_banned
 	(
 		issuer_uuid TEXT(36) NOT NULL,
@@ -85,4 +85,27 @@ var qCreateTableBannedUsers = `
 			ON UPDATE CASCADE
 			ON DELETE CASCADE
 	);
+`
+
+const qCreateViewUserFull = `
+	CREATE VIEW user_full AS
+		SELECT
+			u.user_uuid,
+			u.username,
+			u.display_name,
+			'TODO' as picture_url,
+			COUNT(DISTINCT p.post_uuid) as num_posts,
+			COUNT(DISTINCT fd.follower_uuid) as num_followed,
+			COUNT(DISTINCT fg.followed_uuid) as num_following,
+			u.ts_created
+		FROM
+			user u
+		LEFT JOIN
+			post p ON p.author_uuid = u.user_uuid
+		LEFT JOIN
+			user_followed fd ON fd.followed_uuid = u.user_uuid
+		LEFT JOIN
+			user_followed fg ON fg.follower_uuid = u.user_uuid
+		GROUP BY
+			u.user_uuid;
 `

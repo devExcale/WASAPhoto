@@ -1,11 +1,51 @@
 package database
 
-func (db *appdbimpl) GetBan(issuerUUID, bannedUUID string) (bool, error) {
+import "database/sql"
 
-	var isBanned int
-	var err = db.c.QueryRow(qSelectBan, issuerUUID, bannedUUID).Scan(&isBanned)
+func (db *appdbimpl) IsBanned(issuerUUID, bannedUUID string) (bool, error) {
 
-	return isBanned == 1, err
+	var ban int
+	var err = db.c.QueryRow(qSelectIsBanned, issuerUUID, bannedUUID).Scan(&ban)
+
+	return ban == 1, err
+}
+
+func (db *appdbimpl) GetBannedUsers(issuerUUID string) ([]User, error) {
+
+	var slice = make([]User, 0)
+
+	var rows, err = db.c.Query(qSelectBanned, issuerUUID)
+	if err != nil {
+		return []User{}, err
+	}
+	defer func(rows *sql.Rows) {
+		_ = rows.Close()
+	}(rows)
+
+	// Map rows to users
+	for rows.Next() {
+
+		var user = User{}
+		err = rows.Scan(
+			&user.UUID,
+			&user.Username,
+			&user.DisplayName,
+			&user.PictureURL,
+			&user.CreatedAt,
+		)
+
+		if err != nil {
+			return []User{}, err
+		}
+
+		slice = append(slice, user)
+	}
+
+	// Create array from slice
+	var array = make([]User, len(slice))
+	copy(array, slice)
+
+	return array, nil
 }
 
 func (db *appdbimpl) AddBan(issuerUUID, bannedUUID string) error {

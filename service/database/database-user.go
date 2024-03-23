@@ -10,16 +10,16 @@ const (
 	FilterByUsername
 )
 
-func (db *appdbimpl) GetUser(param string, filterBy int) (User, error) {
+func (db *appdbimpl) GetUserFull(param string, filterBy int) (User, error) {
 
 	var user = User{}
 	var query string
 
 	switch filterBy {
 	case FilterByUUID:
-		query = qSelectUserByUUID
+		query = qSelectUserFullByUUID
 	case FilterByUsername:
-		query = qSelectUserByUsername
+		query = qSelectUserFullByUsername
 	default:
 		return user, errors.New("invalid filterBy value")
 	}
@@ -33,6 +33,21 @@ func (db *appdbimpl) GetUser(param string, filterBy int) (User, error) {
 		&user.NFollowers,
 		&user.NFollowing,
 		&user.CreatedAt)
+
+	return user, err
+}
+
+func (db *appdbimpl) GetUserBasic(uuid string) (User, error) {
+
+	var user = User{}
+
+	err := db.c.QueryRow(qSelectUserBasicByUUID, uuid).Scan(
+		&user.UUID,
+		&user.Username,
+		&user.DisplayName,
+		&user.PictureURL,
+		&user.CreatedAt,
+	)
 
 	return user, err
 }

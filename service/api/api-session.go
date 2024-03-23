@@ -42,7 +42,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, _ httprouter.
 
 	// Check if the user exists
 	var user database.User
-	user, err = rt.db.GetUser(username, database.FilterByUsername)
+	user, err = rt.db.GetUserFull(username, database.FilterByUsername)
 
 	// User not found
 	if errors.Is(err, sql.ErrNoRows) {
@@ -88,7 +88,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, _ httprouter.
 
 }
 
-// getAuthorizedUser returns the authorization token from the request
+// getAuthorizedUser returns minimal information about the authenticated user.
 func (rt *_router) getAuthorizedUser(r *http.Request) *database.User {
 
 	// Get token
@@ -106,7 +106,7 @@ func (rt *_router) getAuthorizedUser(r *http.Request) *database.User {
 
 	// Get user
 	var user database.User
-	user, err = rt.db.GetUser(string(uuidByte), database.FilterByUUID)
+	user, err = rt.db.GetUserBasic(string(uuidByte))
 	if err != nil {
 		return nil
 	}

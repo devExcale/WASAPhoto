@@ -1,13 +1,28 @@
 package database
 
-const qSelectBan = `
-	SELECT COUNT(*)
+const qSelectIsBanned = `
+	SELECT
+		COUNT(*)
 	FROM (
 		SELECT 1
 		FROM user_banned
 		WHERE lower(issuer_uuid) = lower(?)
-			AND lower(banned_uuid) = lower(?)
+		  AND lower(banned_uuid) = lower(?)
 	)`
+
+const qSelectBanned = `
+	SELECT
+		u.user_uuid,
+		u.username,
+		u.display_name,
+		u.picture_url,
+		u.ts_created
+	FROM
+		user_banned b
+	JOIN
+		user u ON u.user_uuid = b.banned_uuid
+	WHERE lower(b.issuer_uuid) = lower(?)
+`
 
 const qInsertBan = `
 	INSERT INTO user_banned(issuer_uuid, banned_uuid)
@@ -15,5 +30,6 @@ const qInsertBan = `
 	ON CONFLICT DO NOTHING`
 
 const qDeleteBan = `
-	DELETE FROM user
-	WHERE lower(user_uuid) = lower(?)`
+	DELETE FROM user_banned
+	WHERE lower(issuer_uuid) = lower(?)
+	  AND lower(banned_uuid) = lower(?)`

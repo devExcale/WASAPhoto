@@ -23,7 +23,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Get request parameters
-	var userUUID = ps.ByName("userUUID")
+	var userUUID = ps.ByName("user_uuid")
 
 	// Check if the userUUID is empty
 	if userUUID == "" {
@@ -32,7 +32,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Check bans
-	var isBanned, err = rt.db.GetBan(loggedUser.UUID, userUUID)
+	var isBanned, err = rt.db.IsBanned(loggedUser.UUID, userUUID)
 	if err != nil {
 
 		ctx.Logger.WithError(err).Error("cannot check ban")
@@ -47,7 +47,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Find requested user
-	searchedUsed, err := rt.db.GetUser(userUUID, database.FilterByUUID)
+	searchedUsed, err := rt.db.GetUserFull(userUUID, database.FilterByUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -114,7 +114,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, _ httpr
 	}
 
 	// Check if the username is already taken
-	_, err = rt.db.GetUser(newUsername, database.FilterByUsername)
+	_, err = rt.db.GetUserFull(newUsername, database.FilterByUsername)
 
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 
