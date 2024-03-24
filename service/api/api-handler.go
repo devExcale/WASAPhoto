@@ -24,9 +24,11 @@ func (rt *_router) Handler() http.Handler {
 	// Post routes
 	r.GET("/me/feed", rt.wrap(rt.getMyStream))
 	r.PUT("/me/feed", rt.wrap(rt.addPost))
+	r.DELETE("/me/feed/:post_uuid", rt.wrap(rt.deletePost))
 	r.GET("/users/:user_uuid/feed", rt.wrap(rt.getUserFeed))
 	r.GET("/users/:user_uuid/feed/:post_uuid", rt.wrap(rt.getUserPost))
 	r.GET("/users/:user_uuid/feed/:post_uuid/webp", rt.wrap(rt.getPostImage))
+	// TODO: delete post
 
 	// Comment routes
 	r.GET("/users/:user_uuid/feed/:post_uuid/comments", rt.wrap(rt.getUserPostComments))

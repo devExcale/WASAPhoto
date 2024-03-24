@@ -95,8 +95,18 @@ type AppDatabase interface {
 	// DeleteFollow removes a follow relationship between two users.
 	DeleteFollow(followerUUID, followedUUID string) error
 
-	//GetComment(uuid string) (Comment, error)
-	//SetComment(comment *Comment) error
+	// GetCommentByUUID retrieves a comment by its UUID
+	GetCommentByUUID(commentUUID string) (Comment, error)
+
+	// GetCommentsByPost retrieves all comments for a given post
+	GetCommentsByPost(postUUID string) ([]Comment, error)
+
+	// SetComment adds a comment to a post
+	SetComment(comment *Comment) error
+
+	// DeleteComment removes a comment from a post
+	DeleteComment(commentUUID string) error
+
 	//AddLikePost(postUUID, userUUID string) error
 	//RemoveLikePost(postUUID, userUUID string) error
 

@@ -1,5 +1,18 @@
 package database
 
+const qSelectCommentByUUID = `
+	SELECT
+		comment_uuid,
+		comment,
+		post_uuid,
+		author_uuid,
+		ts_created
+	FROM
+		post_comment
+	WHERE lower(comment_uuid) = lower(?)
+	ORDER BY ts_created DESC
+`
+
 const qSelectCommentsByPost = `
 	SELECT
 		comment_uuid,

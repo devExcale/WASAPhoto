@@ -276,10 +276,10 @@ func (rt *_router) getPostImage(w http.ResponseWriter, r *http.Request, ps httpr
 
 	}
 
-	// Get image
-	var image []byte
+	// Get post
 	var postUUID = ps.ByName("post_uuid")
-	image, err = rt.db.GetImage(postUUID)
+	var post database.Post
+	post, err = rt.db.GetPost(postUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// Post not found
@@ -287,6 +287,24 @@ func (rt *_router) getPostImage(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 
 	} else if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot get post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	} else if post.AuthorUUID != targetUserUUID {
+
+		// Post not from target (post not found)
+		w.WriteHeader(http.StatusNotFound)
+		return
+
+	}
+
+	// Get image
+	var image []byte
+	image, err = rt.db.GetImage(post.UUID)
+	if err != nil {
 
 		// Unknown error
 		ctx.Logger.WithError(err).Error("cannot get image")
@@ -382,4 +400,8 @@ func (rt *_router) addPost(w http.ResponseWriter, r *http.Request, _ httprouter.
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (rt *_router) deletePost(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// TODO
 }

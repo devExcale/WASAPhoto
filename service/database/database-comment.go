@@ -5,6 +5,22 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+func (db *appdbimpl) GetCommentByUUID(commentUUID string) (Comment, error) {
+
+	var comment Comment
+
+	// Get comment
+	var err = db.c.QueryRow(qSelectCommentByUUID, commentUUID).Scan(
+		&comment.UUID,
+		&comment.Comment,
+		&comment.PostUUID,
+		&comment.AuthorUUID,
+		&comment.CreatedAt,
+	)
+
+	return comment, err
+}
+
 func (db *appdbimpl) GetCommentsByPost(postUUID string) ([]Comment, error) {
 
 	var comments = make([]Comment, 0)
