@@ -48,7 +48,7 @@ func (db *appdbimpl) GetFollowerUsers(userUUID string) ([]User, error) {
 	return array, nil
 }
 
-func (db *appdbimpl) GetFollowedUser(userUUID string) ([]User, error) {
+func (db *appdbimpl) GetFollowedUsers(userUUID string) ([]User, error) {
 
 	var slice = make([]User, 0)
 

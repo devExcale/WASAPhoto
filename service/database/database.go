@@ -80,6 +80,21 @@ type AppDatabase interface {
 	// DeleteBan lifts a ban.
 	DeleteBan(issuerUUID, bannedUUID string) error
 
+	// UserFollows checks if a user follows another user.
+	UserFollows(followerUUID, followedUUID string) (bool, error)
+
+	// GetFollowerUsers retrieves all users that follow the given user.
+	GetFollowerUsers(userUUID string) ([]User, error)
+
+	// GetFollowedUsers retrieves all users followed by the given user.
+	GetFollowedUsers(userUUID string) ([]User, error)
+
+	// AddFollow adds a follow relationship between two users.
+	AddFollow(followerUUID, followedUUID string) error
+
+	// DeleteFollow removes a follow relationship between two users.
+	DeleteFollow(followerUUID, followedUUID string) error
+
 	//GetComment(uuid string) (Comment, error)
 	//SetComment(comment *Comment) error
 	//AddLikePost(postUUID, userUUID string) error
