@@ -12,8 +12,51 @@ import (
 	"strconv"
 )
 
-func (rt *_router) getMyStream(w http.ResponseWriter, _ *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// TODO
+func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	w.Header().Set("content-type", "application/json")
+
+	// Check authorization
+	var user = rt.getAuthorizedUser(r)
+	if user == nil {
+
+		// Token not provided or invalid
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+
+	}
+
+	// Get posts
+	var posts, err = rt.db.GetPostsByFollowed(user.UUID)
+	if err != nil {
+
+		ctx.Logger.WithError(err).Error("cannot get posts")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
+	// Prepare response
+	var response []byte
+	response, err = json.Marshal(posts)
+	if err != nil {
+
+		ctx.Logger.WithError(err).Error("cannot marshal JSON")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
+	// Write response
+	_, err = w.Write(response)
+	if err != nil {
+
+		ctx.Logger.WithError(err).Error("cannot write response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (rt *_router) getUserFeed(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
