@@ -11,13 +11,34 @@ const qSelectFollow = `
 `
 
 const qSelectFollowers = `
-	SELECT *
-	FROM user_followed f
-	JOIN user u on u.user_uuid = f.followed_uuid
-	WHERE lower(f.follower_uuid) = lower(?)
+	SELECT
+		u.user_uuid,
+		u.username,
+		u.display_name,
+		u.picture_url,
+		u.ts_created
+	FROM
+		user u
+	JOIN
+		user_followed f
+		ON f.follower_uuid = u.user_uuid
+	WHERE lower(f.followed_uuid) = lower(?)
 `
 
-const qSelectFollowed = ``
+const qSelectFollowed = `
+	SELECT
+		u.user_uuid,
+		u.username,
+		u.display_name,
+		u.picture_url,
+		u.ts_created
+	FROM
+		user u
+	JOIN
+		user_followed f
+		ON f.followed_uuid = u.user_uuid
+	WHERE lower(f.follower_uuid) = lower(?)
+`
 
 const qInsertFollow = `
 	INSERT INTO user_banned(issuer_uuid, banned_uuid)

@@ -5,13 +5,13 @@ const qSelectPost = `
 		post_uuid,
 		author_uuid,
 		caption,
+		image_url,
 		num_comments,
 		num_likes,
 		ts_created
 	FROM
 		post_full
 	WHERE lower(post_uuid) = lower(?)
-	  AND lower(author_uuid) = lower(?)
 `
 
 const qSelectPostsByUser = `
@@ -19,6 +19,7 @@ const qSelectPostsByUser = `
 		post_uuid,
 		author_uuid,
 		caption,
+		image_url,
 		num_comments,
 		num_likes,
 		ts_created
@@ -33,6 +34,7 @@ const qSelectPostsByFollowed = `
 		p.post_uuid,
 		p.author_uuid,
 		p.caption,
+		p.image_url,
 		p.num_comments,
 		p.num_likes,
 		p.ts_created

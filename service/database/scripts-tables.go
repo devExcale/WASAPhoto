@@ -104,7 +104,7 @@ const qCreateViewUserFull = `
 			u.user_uuid,
 			u.username,
 			u.display_name,
-			'TODO' as picture_url,
+			u. picture_url,
 			COUNT(DISTINCT p.post_uuid) as num_posts,
 			COUNT(DISTINCT fd.follower_uuid) as num_followed,
 			COUNT(DISTINCT fg.followed_uuid) as num_following,
@@ -127,6 +127,7 @@ const qCreateViewPostFull = `
 			p.post_uuid,
 			p.author_uuid,
 			p.caption,
+			'/users/' || p.author_uuid || '/feed/' || p.post_uuid || '/webp' as image_url,
 			COUNT(DISTINCT l.user_uuid) as num_likes,
 			COUNT(DISTINCT c.comment_uuid) as num_comments,
 			p.ts_created

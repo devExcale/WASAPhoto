@@ -10,7 +10,15 @@ func (db *appdbimpl) GetPost(userUUID string) (Post, error) {
 	var post = Post{}
 
 	// Get post
-	err := db.c.QueryRow(qSelectPost, userUUID).Scan(&post.UUID, &post.Caption, &post.CreatedAt, &post.AuthorUUID)
+	err := db.c.QueryRow(qSelectPost, userUUID).Scan(
+		&post.UUID,
+		&post.AuthorUUID,
+		&post.Caption,
+		&post.ImageURL,
+		&post.NComments,
+		&post.NLikes,
+		&post.CreatedAt,
+	)
 
 	return post, err
 }
@@ -34,7 +42,15 @@ func (db *appdbimpl) GetPostsByUser(userUUID string) ([]Post, error) {
 	for rows.Next() {
 
 		var post Post
-		err = rows.Scan(&post.UUID, &post.Caption, &post.CreatedAt, &post.AuthorUUID)
+		err = rows.Scan(
+			&post.UUID,
+			&post.AuthorUUID,
+			&post.Caption,
+			&post.ImageURL,
+			&post.NComments,
+			&post.NLikes,
+			&post.CreatedAt,
+		)
 
 		if err != nil {
 			return posts, err
@@ -65,7 +81,15 @@ func (db *appdbimpl) GetPostsByFollowed(userUUID string) ([]Post, error) {
 	for rows.Next() {
 
 		var post Post
-		err = rows.Scan(&post.UUID, &post.Caption, &post.CreatedAt, &post.AuthorUUID)
+		err = rows.Scan(
+			&post.UUID,
+			&post.AuthorUUID,
+			&post.Caption,
+			&post.ImageURL,
+			&post.NComments,
+			&post.NLikes,
+			&post.CreatedAt,
+		)
 
 		if err != nil {
 			return posts, err
