@@ -1,6 +1,8 @@
 package util
 
-import "regexp"
+import (
+	"regexp"
+)
 
 var usernameRegex = regexp.MustCompile(`^[\w\-.]{3,20}$`)
 

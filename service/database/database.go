@@ -43,24 +43,33 @@ type AppDatabase interface {
 	GetUserFull(param string, filterBy int) (User, error)
 
 	// GetUserBasic retrieves minimal user information with the given UUID.
-	GetUserBasic(uuid string) (User, error)
+	GetUserBasic(userUUID string) (User, error)
 
 	// SetUser adds or updates a user. No need to provide the UUID for new users.
 	// The object passed as parameter will be updated with the inserted data.
 	SetUser(user *User) error
 
 	// DeleteUser removes the user with the given UUID.
-	DeleteUser(uuid string) error
+	DeleteUser(userUUID string) error
 
 	// GetPost retrieves the post with the given UUID.
-	GetPost(uuid string) (Post, error)
+	GetPost(postUUID string) (Post, error)
+
+	// GetPostsByUser retrieves all posts by the given user.
+	GetPostsByUser(userUUID string) ([]Post, error)
+
+	// GetPostsByFollowed retrieves all posts by the users followed by the given user.
+	GetPostsByFollowed(userUUID string) ([]Post, error)
+
+	// GetImage retrieves the image of the post with the given UUID.
+	GetImage(postUUID string) ([]byte, error)
 
 	// SetPost adds or updates a post. No need to provide the UUID for new posts.
 	// The object passed as parameter will be updated with the inserted data.
-	SetPost(post *Post) error
+	SetPost(post *Post, image []byte) error
 
 	// DeletePost removes the post with the given UUID.
-	DeletePost(uuid string) error
+	DeletePost(postUUID string) error
 
 	// IsBanned checks if a user is banned by another user.
 	IsBanned(issuerUUID, bannedUUID string) (bool, error)
@@ -91,49 +100,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
 
-	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var err error
 
-	// user table
-	err = createTableIfNotExists(db, `user`, qCreateTableUser)
-	if err != nil {
-		return nil, fmt.Errorf("error creating database structure: %w", err)
-	}
-
-	// post table
-	err = createTableIfNotExists(db, `post`, qCreateTablePost)
-	if err != nil {
-		return nil, fmt.Errorf("error creating database structure: %w", err)
-	}
-
-	// post_comment table
-	err = createTableIfNotExists(db, `post_comment`, qCreateTableComment)
-	if err != nil {
-		return nil, fmt.Errorf("error creating database structure: %w", err)
-	}
-
-	// post_like table
-	err = createTableIfNotExists(db, `post_like`, qCreateTableLike)
-	if err != nil {
-		return nil, fmt.Errorf("error creating database structure: %w", err)
-	}
-
-	// user_followed table
-	err = createTableIfNotExists(db, `user_followed`, qCreateTableFollowedUsers)
-	if err != nil {
-		return nil, fmt.Errorf("error creating database structure: %w", err)
-	}
-
-	// user_banned table
-	err = createTableIfNotExists(db, `user_banned`, qCreateTableBannedUsers)
-	if err != nil {
-		return nil, fmt.Errorf("error creating database structure: %w", err)
-	}
-
-	// user_full view
-	err = createTableIfNotExists(db, `user_full`, qCreateViewUserFull)
-	if err != nil {
-		return nil, fmt.Errorf("error creating database structure: %w", err)
+	// Check if table exists. If not, the database is empty, and we need to create the structure
+	for tablename, createStmt := range tables {
+		err = createTableIfNotExists(db, tablename, createStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating table %s: %w", tablename, err)
+		}
 	}
 
 	return &appdbimpl{c: db}, nil

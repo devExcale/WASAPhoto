@@ -66,6 +66,32 @@ paths:
           $ref: '#/components/responses/401-Unauthorized'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
+    put:
+      operationId: addPost
+      summary: Add a post
+      description: Uploads a new post to the user's feed.
+      tags: [ 'Post' ]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The webp image file to upload.
+                  nullable: false
+      responses:
+        '201': # Created
+          description: Post added correctly
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
 
   /me/change_username:
     post:

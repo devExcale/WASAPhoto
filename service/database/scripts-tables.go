@@ -1,5 +1,16 @@
 package database
 
+var tables = map[string]string{
+	"user":          qCreateTableUser,
+	"post":          qCreateTablePost,
+	"post_comment":  qCreateTableComment,
+	"post_like":     qCreateTableLike,
+	"user_followed": qCreateTableFollowedUsers,
+	"user_banned":   qCreateTableBannedUsers,
+	"user_full":     qCreateViewUserFull,
+	"post_full":     qCreateViewPostFull,
+}
+
 const qCreateTableUser = `
 	CREATE TABLE user
 	(
@@ -8,7 +19,7 @@ const qCreateTableUser = `
 		display_name TEXT(40)  NOT NULL,
 		picture_url  TEXT      NULL,
 		ts_created   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-	);
+	)
 `
 
 const qCreateTablePost = `
@@ -22,7 +33,7 @@ const qCreateTablePost = `
 		FOREIGN KEY (author_uuid) REFERENCES user (user_uuid)
 			ON DELETE CASCADE
 			ON UPDATE CASCADE
-	);
+	)
 `
 
 const qCreateTableComment = `
@@ -39,7 +50,7 @@ const qCreateTableComment = `
 		FOREIGN KEY (author_uuid) REFERENCES user (user_uuid)
 			ON UPDATE CASCADE
 			ON DELETE CASCADE
-	);
+	)
 `
 
 const qCreateTableLike = `
@@ -54,7 +65,7 @@ const qCreateTableLike = `
 		FOREIGN KEY (user_uuid) REFERENCES user (user_uuid)
 			ON UPDATE CASCADE
 			ON DELETE CASCADE
-	);
+	)
 `
 
 const qCreateTableFollowedUsers = `
@@ -69,7 +80,7 @@ const qCreateTableFollowedUsers = `
 		FOREIGN KEY (followed_uuid) REFERENCES user (user_uuid)
 			ON UPDATE CASCADE
 			ON DELETE CASCADE
-	);
+	)
 `
 
 const qCreateTableBannedUsers = `
@@ -84,7 +95,7 @@ const qCreateTableBannedUsers = `
 		FOREIGN KEY (banned_uuid) REFERENCES user (user_uuid)
 			ON UPDATE CASCADE
 			ON DELETE CASCADE
-	);
+	)
 `
 
 const qCreateViewUserFull = `
@@ -107,5 +118,24 @@ const qCreateViewUserFull = `
 		LEFT JOIN
 			user_followed fg ON fg.follower_uuid = u.user_uuid
 		GROUP BY
-			u.user_uuid;
+			u.user_uuid
+`
+
+const qCreateViewPostFull = `
+	CREATE VIEW post_full AS
+		SELECT
+			p.post_uuid,
+			p.author_uuid,
+			p.caption,
+			COUNT(DISTINCT l.user_uuid) as num_likes,
+			COUNT(DISTINCT c.comment_uuid) as num_comments,
+			p.ts_created
+		FROM
+			post p
+		LEFT JOIN
+			post_like l ON l.post_uuid = p.post_uuid
+		LEFT JOIN
+			post_comment c ON c.post_uuid = p.post_uuid
+		GROUP BY
+			p.post_uuid
 `
