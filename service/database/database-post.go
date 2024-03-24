@@ -5,12 +5,12 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func (db *appdbimpl) GetPost(userUUID string) (Post, error) {
+func (db *appdbimpl) GetPost(postUUID string) (Post, error) {
 
 	var post = Post{}
 
 	// Get post
-	err := db.c.QueryRow(qSelectPost, userUUID).Scan(
+	err := db.c.QueryRow(qSelectPost, postUUID).Scan(
 		&post.UUID,
 		&post.AuthorUUID,
 		&post.Caption,
