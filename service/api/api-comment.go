@@ -302,6 +302,17 @@ func (rt *_router) removeUserPostComment(w http.ResponseWriter, r *http.Request,
 
 	}
 
+	// Remove comment
+	err = rt.db.DeleteComment(commentUUID)
+	if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot remove comment")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
 	// Write the response
 	w.WriteHeader(http.StatusOK)
 
