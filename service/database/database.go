@@ -107,8 +107,17 @@ type AppDatabase interface {
 	// DeleteComment removes a comment from a post
 	DeleteComment(commentUUID string) error
 
-	//AddLikePost(postUUID, userUUID string) error
-	//RemoveLikePost(postUUID, userUUID string) error
+	// UserHasLikedPost checks if a user has liked a post
+	UserHasLikedPost(postUUID, userUUID string) (bool, error)
+
+	// GetUsersLikedPost retrieves all users who liked a post
+	GetUsersLikedPost(postUUID string) ([]User, error)
+
+	// AddLike adds a like to a post
+	AddLike(postUUID, userUUID string) error
+
+	// DeleteLike removes a like from a post
+	DeleteLike(postUUID, userUUID string) error
 
 	Ping() error
 }
