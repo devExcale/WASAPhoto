@@ -74,6 +74,9 @@ type AppDatabase interface {
 	// IsBanned checks if a user is banned by another user.
 	IsBanned(issuerUUID, bannedUUID string) (bool, error)
 
+	// GetBannedUsers retrieves all users banned by the given user.
+	GetBannedUsers(issuerUUID string) ([]User, error)
+
 	// AddBan bans a user from seeing another user's content.
 	AddBan(issuerUUID, bannedUUID string) error
 
