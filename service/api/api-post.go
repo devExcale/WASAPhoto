@@ -403,5 +403,53 @@ func (rt *_router) addPost(w http.ResponseWriter, r *http.Request, _ httprouter.
 }
 
 func (rt *_router) deletePost(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	// TODO
+	w.Header().Set("content-type", "application/json")
+
+	// Check authorization
+	var loggedUser = rt.getAuthorizedUser(r)
+	if loggedUser == nil {
+
+		// Token not provided or invalid
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+
+	}
+
+	// Get post
+	var postUUID = ps.ByName("post_uuid")
+	var post, err = rt.db.GetPost(postUUID)
+	if errors.Is(err, sql.ErrNoRows) {
+
+		// Post not found
+		w.WriteHeader(http.StatusNotFound)
+		return
+
+	} else if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot get post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	} else if post.AuthorUUID != loggedUser.UUID {
+
+		// Given user is not the author of the post
+		w.WriteHeader(http.StatusNotFound)
+		return
+
+	}
+
+	// Delete post
+	err = rt.db.DeletePost(postUUID)
+	if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot delete post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
+	// Write the response
+	w.WriteHeader(http.StatusOK)
 }
