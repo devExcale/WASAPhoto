@@ -29,6 +29,7 @@ const qSelectUsersLikedPost = `
 const qInsertLike = `
 	INSERT INTO post_like(post_uuid, user_uuid)
 	VALUES(lower(?), lower(?))
+	ON CONFLICT DO NOTHING
 `
 
 const qDeleteLike = `
