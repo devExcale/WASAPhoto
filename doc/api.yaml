@@ -52,7 +52,7 @@ tags:
 paths:
 
   /me/feed:
-    patch:
+    get:
       operationId: getMyStream
       summary: Posts by the followed users
       description: Returns a list of posts made by the users the current user is following.
@@ -83,6 +83,16 @@ paths:
                   format: binary
                   description: The webp image file to upload.
                   nullable: false
+                json:
+                  type: object
+                  description: Information regarding the post
+                  nullable: true
+                  properties:
+                    caption:
+                      type: string
+                      description: The caption of the post.
+                      example: Working on this new project!
+                      nullable: true
       responses:
         '201': # Created
           description: Post added correctly
@@ -121,6 +131,30 @@ paths:
           $ref: '#/components/responses/401-Unauthorized'
         '409': # Conflict
           description: The chosen username is already taken
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /find_user:
+    get:
+      operationId: findUser
+      summary: Find a user by username
+      description: Returns the list of users whose username matches the given substring.
+      tags: [ 'User' ]
+      parameters:
+        - name: username
+          in: query
+          required: true
+          description: The substring to search for in the username.
+          example: exc
+          schema:
+            $ref: '#/components/schemas/Username'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-UserList'
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -477,7 +511,7 @@ components:
       description: UUID of the target user
       example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
       schema:
-          $ref: '#/components/schemas/UUID'
+        $ref: '#/components/schemas/UUID'
 
     pathPostUUID:
       name: post_uuid
@@ -486,7 +520,7 @@ components:
       description: UUID of the target post
       example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
       schema:
-          $ref: '#/components/schemas/UUID'
+        $ref: '#/components/schemas/UUID'
 
     pathCommentUUID:
       name: comment_uuid
@@ -495,7 +529,7 @@ components:
       description: UUID of the target comment
       example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
       schema:
-          $ref: '#/components/schemas/UUID'
+        $ref: '#/components/schemas/UUID'
 
   #######################
   ## Schema components ##

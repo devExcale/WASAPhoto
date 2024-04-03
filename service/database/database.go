@@ -52,6 +52,9 @@ type AppDatabase interface {
 	// DeleteUser removes the user with the given UUID.
 	DeleteUser(userUUID string) error
 
+	// GetUsersWithUsernameSubstr retrieves all users with a username containing the given substring.
+	GetUsersWithUsernameSubstr(substring string, loggedUserUUID string) ([]User, error)
+
 	// GetPost retrieves the post with the given UUID.
 	GetPost(postUUID string) (Post, error)
 

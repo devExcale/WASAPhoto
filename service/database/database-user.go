@@ -83,3 +83,40 @@ func (db *appdbimpl) DeleteUser(uuid string) error {
 
 	return err
 }
+
+func (db *appdbimpl) GetUsersWithUsernameSubstr(substring string, loggedUserUUID string) ([]User, error) {
+
+	var users = make([]User, 0)
+
+	// Get users
+	rows, err := db.c.Query(qSelectUsersByUsernameSubstr, substring, loggedUserUUID)
+	if err != nil {
+		return users, err
+	}
+
+	// Close rows at the end
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	// Map rows to users
+	for rows.Next() {
+
+		var user User
+		err = rows.Scan(
+			&user.UUID,
+			&user.Username,
+			&user.DisplayName,
+			&user.PictureURL,
+			&user.CreatedAt,
+		)
+
+		if err != nil {
+			return users, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}

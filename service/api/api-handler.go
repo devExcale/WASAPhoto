@@ -19,6 +19,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// User routes
 	r.GET("/users/:user_uuid", rt.wrap(rt.getUserProfile))
+	r.GET("/find_user", rt.wrap(rt.findUser))
 	r.POST("/me/change_username", rt.wrap(rt.setMyUserName))
 
 	// Post routes

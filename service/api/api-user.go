@@ -47,7 +47,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Find requested user
-	searchedUsed, err := rt.db.GetUserFull(userUUID, database.FilterByUUID)
+	searchedUser, err := rt.db.GetUserFull(userUUID, database.FilterByUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -64,10 +64,10 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	var response []byte
-	response, err = json.Marshal(searchedUsed)
+	response, err = json.Marshal(searchedUser)
 	if err != nil {
 
-		// Error while marshalling the searchedUsed
+		// Error while marshalling the searchedUser
 		ctx.Logger.WithError(err).Error("cannot marshal user")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -146,4 +146,52 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, _ httpr
 
 	// Write the response
 	w.WriteHeader(http.StatusOK)
+}
+
+func (rt *_router) findUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {
+	w.Header().Set("content-type", "application/json")
+
+	// Check authorization
+	var loggedUser = rt.getAuthorizedUser(r)
+	if loggedUser == nil {
+
+		// Token not provided or invalid
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+
+	}
+
+	// Get request parameters
+	var targetUsername = r.URL.Query().Get("username")
+
+	// Check if the username is empty
+	if targetUsername == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Search users
+	var users []database.User
+	users, err := rt.db.GetUsersWithUsernameSubstr(targetUsername, loggedUser.UUID)
+	if err != nil {
+
+		// Generic error
+		ctx.Logger.WithError(err).Error("cannot get users")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
+	var response []byte
+	response, err = json.Marshal(users)
+	if err != nil {
+
+		// Error while marshalling the searchedUsed
+		ctx.Logger.WithError(err).Error("cannot marshal user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Write the response
+	httpSimpleResponse(http.StatusOK, response, w, ctx)
 }

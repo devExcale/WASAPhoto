@@ -101,6 +101,17 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	}
 
+	// Remove follow from given user
+	err = rt.db.DeleteFollow(targetUUID, loggedUser.UUID)
+	if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot remove follow")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
 	w.WriteHeader(http.StatusCreated)
 }
 
