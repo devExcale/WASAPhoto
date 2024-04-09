@@ -140,32 +140,6 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
-  /find_user:
-    get:
-      operationId: findUser
-      summary: Find a user by username
-      description: Returns the list of users whose username matches the given substring.
-      tags: [ 'User' ]
-      security:
-        - Bearer: [ ]
-      parameters:
-        - name: username
-          in: query
-          required: true
-          description: The substring to search for in the username.
-          example: exc
-          schema:
-            $ref: '#/components/schemas/Username'
-      responses:
-        '200': # OK
-          $ref: '#/components/responses/200-UserList'
-        '400': # Bad Request
-          $ref: '#/components/responses/400-BadRequest'
-        '401': # Unauthorized
-          $ref: '#/components/responses/401-Unauthorized'
-        '500': # Internal Error
-          $ref: '#/components/responses/500-InternalError'
-
   /me/followed_users:
     get:
       operationId: getFollowedUsers
@@ -292,6 +266,32 @@ paths:
           $ref: '#/components/responses/401-Unauthorized'
         '404': # Not Found
           $ref: '#/components/responses/404-UserNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /users:
+    get:
+      operationId: findUser
+      summary: Find a user by username
+      description: Returns the list of users whose username matches the given substring.
+      tags: [ 'User' ]
+      security:
+        - Bearer: [ ]
+      parameters:
+        - name: username
+          in: query
+          required: true
+          description: The substring to search for in the username.
+          example: exc
+          schema:
+            $ref: '#/components/schemas/Username'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-UserList'
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
