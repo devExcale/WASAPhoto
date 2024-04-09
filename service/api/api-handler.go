@@ -24,21 +24,21 @@ func (rt *_router) Handler() http.Handler {
 
 	// Post routes
 	r.GET("/me/feed", rt.wrap(rt.getMyStream))
-	r.PUT("/me/feed", rt.wrap(rt.addPost))
-	r.DELETE("/me/feed/:post_uuid", rt.wrap(rt.deletePost))
+	r.PUT("/me/feed", rt.wrap(rt.uploadPhoto))
+	r.DELETE("/me/feed/:post_uuid", rt.wrap(rt.deletePhoto))
 	r.GET("/users/:user_uuid/feed", rt.wrap(rt.getUserFeed))
-	r.GET("/users/:user_uuid/feed/:post_uuid", rt.wrap(rt.getUserPost))
-	r.GET("/users/:user_uuid/feed/:post_uuid/webp", rt.wrap(rt.getPostImage))
+	r.GET("/users/:user_uuid/feed/:post_uuid", rt.wrap(rt.getPhoto))
+	r.GET("/users/:user_uuid/feed/:post_uuid/webp", rt.wrap(rt.getPostImage)) // TODO: api.yaml
 
 	// Comment routes
-	r.GET("/users/:user_uuid/feed/:post_uuid/comments", rt.wrap(rt.getUserPostComments))
-	r.PUT("/users/:user_uuid/feed/:post_uuid/comments", rt.wrap(rt.addUserPostComment))
-	r.DELETE("/users/:user_uuid/feed/:post_uuid/comments/:comment_uuid", rt.wrap(rt.removeUserPostComment))
+	r.GET("/users/:user_uuid/feed/:post_uuid/comments", rt.wrap(rt.getComments))
+	r.PUT("/users/:user_uuid/feed/:post_uuid/comments", rt.wrap(rt.commentPhoto))
+	r.DELETE("/users/:user_uuid/feed/:post_uuid/comments/:comment_uuid", rt.wrap(rt.uncommentPhoto))
 
 	// Likes routes
-	r.GET("/users/:user_uuid/feed/:post_uuid/likes", rt.wrap(rt.getUserPostLikes))
-	r.PUT("/users/:user_uuid/feed/:post_uuid/likes", rt.wrap(rt.addUserPostLike))
-	r.DELETE("/users/:user_uuid/feed/:post_uuid/likes", rt.wrap(rt.removeUserPostLike))
+	r.GET("/users/:user_uuid/feed/:post_uuid/likes", rt.wrap(rt.getLikes))
+	r.PUT("/users/:user_uuid/feed/:post_uuid/likes", rt.wrap(rt.likePhoto))
+	r.DELETE("/users/:user_uuid/feed/:post_uuid/likes", rt.wrap(rt.unlikePhoto))
 
 	// Follow routes
 	r.GET("/me/followed_users", rt.wrap(rt.getFollowedUsers))

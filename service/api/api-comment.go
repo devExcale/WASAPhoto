@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func (rt *_router) getUserPostComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization
@@ -115,7 +115,7 @@ func (rt *_router) getUserPostComments(w http.ResponseWriter, r *http.Request, p
 	w.WriteHeader(http.StatusOK)
 }
 
-func (rt *_router) addUserPostComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization
@@ -215,7 +215,7 @@ func (rt *_router) addUserPostComment(w http.ResponseWriter, r *http.Request, ps
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (rt *_router) removeUserPostComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization

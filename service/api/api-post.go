@@ -149,7 +149,7 @@ func (rt *_router) getUserFeed(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusOK)
 }
 
-func (rt *_router) getUserPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization
@@ -328,7 +328,7 @@ func (rt *_router) getPostImage(w http.ResponseWriter, r *http.Request, ps httpr
 	w.WriteHeader(http.StatusOK)
 }
 
-func (rt *_router) addPost(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization
@@ -402,7 +402,7 @@ func (rt *_router) addPost(w http.ResponseWriter, r *http.Request, _ httprouter.
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (rt *_router) deletePost(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization

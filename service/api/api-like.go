@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func (rt *_router) getUserPostLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization
@@ -115,7 +115,7 @@ func (rt *_router) getUserPostLikes(w http.ResponseWriter, r *http.Request, ps h
 	w.WriteHeader(http.StatusOK)
 }
 
-func (rt *_router) addUserPostLike(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization
@@ -196,7 +196,7 @@ func (rt *_router) addUserPostLike(w http.ResponseWriter, r *http.Request, ps ht
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (rt *_router) removeUserPostLike(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization

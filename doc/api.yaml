@@ -193,7 +193,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
-        '204': # No Comment
+        '204': # No Content
           description: User followed correctly
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
@@ -364,7 +364,7 @@ paths:
 
   /users/{user_uuid}/feed/{post_uuid}:
     get:
-      operationId: getUserPost
+      operationId: getPhoto
       summary: Get a user's post
       description: Returns a given post made by the given user.
       tags: [ 'Post' ]
@@ -456,7 +456,7 @@ paths:
 
   /users/{user_uuid}/feed/{post_uuid}/comments:
     get:
-      operationId: getUserPostComments
+      operationId: getComments
       summary: Get a post's comments
       description: Returns the list of comments made under the given post.
       tags: [ 'Comment' ]
