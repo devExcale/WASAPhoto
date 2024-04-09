@@ -107,8 +107,8 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
-  /me/change_username:
-    post:
+  /me/username:
+    patch:
       operationId: setMyUserName
       summary: Changes the user's username
       description: |-
