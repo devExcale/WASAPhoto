@@ -99,7 +99,7 @@ paths:
                       nullable: true
       responses:
         '201': # Created
-          description: Post added correctly
+          $ref: '#/components/responses/201-Post'
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
         '401': # Unauthorized
@@ -129,7 +129,7 @@ paths:
                 username:
                   $ref: '#/components/schemas/Username'
       responses:
-        '200': # OK
+        '204': # No Content
           description: Username changed correctly
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
@@ -170,8 +170,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
-        '200': # OK
-          $ref: '#/components/responses/200-Success'
+        '204': # No Comment
+          description: User followed correctly
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
         '401': # Unauthorized
@@ -195,8 +195,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
-        '200': # OK
-          $ref: '#/components/responses/200-Success'
+        '204': # No Content
+          description: User unfollowed correctly
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
         '401': # Unauthorized
@@ -235,8 +235,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
-        '200': # OK
-          $ref: '#/components/responses/200-Success'
+        '204': # No Content
+          description: User banned correctly
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
         '401': # Unauthorized
@@ -258,8 +258,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
-        '200': # OK
-          $ref: '#/components/responses/200-Success'
+        '204': # No Content
+          description: User unbanned correctly
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
         '401': # Unauthorized
@@ -395,7 +395,7 @@ paths:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
       responses:
-        '200': # OK
+        '204': # No Content
           description: Like added correctly
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
@@ -418,7 +418,7 @@ paths:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
       responses:
-        '200': # OK
+        '204': # No Content
           description: Like removed correctly
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
@@ -464,8 +464,8 @@ paths:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
       responses:
-        '200': # OK
-          description: Comment added correctly
+        '201': # Created
+          $ref: '#/components/responses/201-Comment'
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
         '401': # Unauthorized
@@ -490,7 +490,7 @@ paths:
         - $ref: '#/components/parameters/pathPostUUID'
         - $ref: '#/components/parameters/pathCommentUUID'
       responses:
-        '200': # OK
+        '204': # No Content
           description: Comment removed correctly
         '400': # Bad Request
           $ref: '#/components/responses/400-BadRequest'
@@ -744,6 +744,20 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CommentList'
+
+    201-Post:
+      description: Post created correctly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Post'
+
+    201-Comment:
+      description: Comment created correctly.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Comment'
 
     200-Success:
       description: The operation was successful.
