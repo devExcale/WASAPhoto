@@ -57,6 +57,8 @@ paths:
       summary: Posts by the followed users
       description: Returns a list of posts made by the users the current user is following.
       tags: [ 'Post' ]
+      security:
+        - Bearer: [ ]
       responses:
         '200': # OK
           $ref: '#/components/responses/200-PostList'
@@ -71,6 +73,8 @@ paths:
       summary: Add a post
       description: Uploads a new post to the user's feed.
       tags: [ 'Post' ]
+      security:
+        - Bearer: [ ]
       requestBody:
         required: true
         content:
@@ -111,6 +115,8 @@ paths:
         Changes the user's username; if the username is already taken an error is returned.
         The previous username won't be reserved and it will be available to other users for the taking.
       tags: [ 'User' ]
+      security:
+        - Bearer: [ ]
       requestBody:
         description: User details
         content:
@@ -140,6 +146,8 @@ paths:
       summary: Find a user by username
       description: Returns the list of users whose username matches the given substring.
       tags: [ 'User' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - name: username
           in: query
@@ -164,6 +172,8 @@ paths:
       summary: Get followed users
       description: Returns the list of users the current user is following.
       tags: [ 'Follow' ]
+      security:
+        - Bearer: [ ]
       responses:
         '200': # OK
           $ref: '#/components/responses/200-UserList'
@@ -181,6 +191,8 @@ paths:
         If the given user is already in the list,
         the response will be as if the user wasn't in the list before (i.e. 200).
       tags: [ 'Follow' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
@@ -200,6 +212,8 @@ paths:
       operationId: unfollowUser
       summary: Unfollow a user
       tags: [ 'Follow' ]
+      security:
+        - Bearer: [ ]
       description: |-
         Removes the specified user from the current user's list of followed users.
         If the user doesn't belong to the list,
@@ -224,6 +238,8 @@ paths:
       summary: Get banned users
       description: Returns the list of users the current user has banned
       tags: [ 'Ban' ]
+      security:
+        - Bearer: [ ]
       responses:
         '200': # OK
           $ref: '#/components/responses/200-UserList'
@@ -240,6 +256,8 @@ paths:
         Adds the given user to the current user's list of banned users.
         The banned user won't be able to see the user's content.
       tags: [ 'Ban' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
@@ -261,6 +279,8 @@ paths:
         If the user doesn't belong to the list,
         the response will be as if the user would have been removed correctly (i.e. 200).
       tags: [ 'Ban' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
@@ -281,6 +301,8 @@ paths:
       summary: Get user profile
       description: Returns the profile of the given user.
       tags: [ 'User' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
@@ -301,6 +323,8 @@ paths:
       summary: Get all user's posts
       description: Returns the list of the posts made by the given user.
       tags: [ 'Post' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
       responses:
@@ -321,6 +345,8 @@ paths:
       summary: Get a user's post
       description: Returns a given post made by the given user.
       tags: [ 'Post' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
@@ -342,6 +368,8 @@ paths:
       summary: Get users who liked a post
       description: Returns the list of users who liked the given post.
       tags: [ 'Like' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
@@ -361,6 +389,8 @@ paths:
       summary: Like a post
       description: Adds a like to the given post.
       tags: [ 'Like' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
@@ -382,6 +412,8 @@ paths:
       summary: Remove the like from a post
       description: Removes the user's like from the given post.
       tags: [ 'Like' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
@@ -405,6 +437,8 @@ paths:
       summary: Get a post's comments
       description: Returns the list of comments made under the given post.
       tags: [ 'Comment' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
@@ -424,6 +458,8 @@ paths:
       summary: Comment a post
       description: Adds a comment to the given post.
       tags: [ 'Comment' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
@@ -447,6 +483,8 @@ paths:
       summary: Remove a comment
       description: Removes the given comment from the given post.
       tags: [ 'Comment' ]
+      security:
+        - Bearer: [ ]
       parameters:
         - $ref: '#/components/parameters/pathUserUUID'
         - $ref: '#/components/parameters/pathPostUUID'
@@ -497,7 +535,18 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
+################
+## Components ##
+################
 components:
+
+  ##########################
+  ## Security components ##
+  ##########################
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
 
   ##########################
   ## Parameter components ##
