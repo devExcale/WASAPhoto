@@ -96,7 +96,9 @@ func (db *appdbimpl) GetUsersWithUsernameSubstr(substring string, loggedUserUUID
 
 	// Close rows at the end
 	defer func() {
-		_ = rows.Close()
+		err = rows.Close()
+		if err != nil {
+		}
 	}()
 
 	// Map rows to users

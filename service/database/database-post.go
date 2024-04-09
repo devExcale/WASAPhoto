@@ -35,7 +35,9 @@ func (db *appdbimpl) GetPostsByUser(userUUID string) ([]Post, error) {
 
 	// Close rows at the end
 	defer func() {
-		_ = rows.Close()
+		err = rows.Close()
+		if err != nil {
+		}
 	}()
 
 	// Map rows to posts
@@ -74,7 +76,9 @@ func (db *appdbimpl) GetPostsByFollowed(userUUID string) ([]Post, error) {
 
 	// Close rows at the end
 	defer func() {
-		_ = rows.Close()
+		err = rows.Close()
+		if err != nil {
+		}
 	}()
 
 	// Map rows to posts

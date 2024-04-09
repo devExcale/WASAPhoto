@@ -33,7 +33,9 @@ func (db *appdbimpl) GetCommentsByPost(postUUID string) ([]Comment, error) {
 
 	// Close rows at the end
 	defer func() {
-		_ = rows.Close()
+		err = rows.Close()
+		if err != nil {
+		}
 	}()
 
 	// Map rows to comments

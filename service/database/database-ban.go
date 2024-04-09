@@ -1,7 +1,5 @@
 package database
 
-import "database/sql"
-
 func (db *appdbimpl) IsBanned(issuerUUID, bannedUUID string) (bool, error) {
 
 	var ban int
@@ -18,9 +16,13 @@ func (db *appdbimpl) GetBannedUsers(issuerUUID string) ([]User, error) {
 	if err != nil {
 		return []User{}, err
 	}
-	defer func(rows *sql.Rows) {
-		_ = rows.Close()
-	}(rows)
+
+	// Close rows at the end
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+		}
+	}()
 
 	// Map rows to users
 	for rows.Next() {

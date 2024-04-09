@@ -1,7 +1,5 @@
 package database
 
-import "database/sql"
-
 func (db *appdbimpl) UserFollows(followerUUID, followedUUID string) (bool, error) {
 
 	var isfollowed int
@@ -18,9 +16,13 @@ func (db *appdbimpl) GetFollowerUsers(userUUID string) ([]User, error) {
 	if err != nil {
 		return []User{}, err
 	}
-	defer func(rows *sql.Rows) {
-		_ = rows.Close()
-	}(rows)
+
+	// Close rows at the end
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+		}
+	}()
 
 	// Map rows to users
 	for rows.Next() {
@@ -56,9 +58,13 @@ func (db *appdbimpl) GetFollowedUsers(userUUID string) ([]User, error) {
 	if err != nil {
 		return []User{}, err
 	}
-	defer func(rows *sql.Rows) {
-		_ = rows.Close()
-	}(rows)
+
+	// Close rows at the end
+	defer func() {
+		err = rows.Close()
+		if err != nil {
+		}
+	}()
 
 	// Map rows to users
 	for rows.Next() {
