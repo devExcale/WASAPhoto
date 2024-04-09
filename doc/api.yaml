@@ -69,7 +69,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
     put:
-      operationId: addPost
+      operationId: uploadPhoto
       summary: Add a post
       description: Uploads a new post to the user's feed.
       tags: [ 'Post' ]
@@ -104,6 +104,29 @@ paths:
           $ref: '#/components/responses/400-BadRequest'
         '401': # Unauthorized
           $ref: '#/components/responses/401-Unauthorized'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+
+  /me/feed/{post_uuid}:
+    delete:
+      operationId: deletePhoto
+      summary: Remove a post
+      description: Removes a post from the user's feed.
+      tags: [ 'Post' ]
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: '#/components/parameters/pathPostUUID'
+      responses:
+        '204': # No Content
+          description: Post removed correctly
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '404': # Not Found
+          $ref: '#/components/responses/404-PostNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -364,7 +387,7 @@ paths:
 
   /users/{user_uuid}/feed/{post_uuid}/likes:
     get:
-      operationId: getUserPostLikes
+      operationId: getLikes
       summary: Get users who liked a post
       description: Returns the list of users who liked the given post.
       tags: [ 'Like' ]
@@ -385,7 +408,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
     put:
-      operationId: addUserPostLike
+      operationId: likePhoto
       summary: Like a post
       description: Adds a like to the given post.
       tags: [ 'Like' ]
@@ -408,7 +431,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
     delete:
-      operationId: removeUserPostLike
+      operationId: unlikePhoto
       summary: Remove the like from a post
       description: Removes the user's like from the given post.
       tags: [ 'Like' ]
@@ -454,7 +477,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
     put:
-      operationId: addUserPostComment
+      operationId: commentPhoto
       summary: Comment a post
       description: Adds a comment to the given post.
       tags: [ 'Comment' ]
@@ -479,7 +502,7 @@ paths:
 
   /users/{user_uuid}/feed/{post_uuid}/comments/{comment_uuid}:
     delete:
-      operationId: removeUserPostComment
+      operationId: uncommentPhoto
       summary: Remove a comment
       description: Removes the given comment from the given post.
       tags: [ 'Comment' ]
