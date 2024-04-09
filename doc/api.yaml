@@ -385,6 +385,29 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
+  /users/{user_uuid}/feed/{post_uuid}/webp:
+    get:
+      operationId: getPhotoImage
+      summary: Get a post's image
+      description: Returns the webp image file of the given post.
+      tags: [ 'Post' ]
+      security:
+        - Bearer: [ ]
+      parameters:
+        - $ref: '#/components/parameters/pathUserUUID'
+        - $ref: '#/components/parameters/pathPostUUID'
+      responses:
+        '200': # OK
+          $ref: '#/components/responses/200-Image'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '403': # Forbidden
+          $ref: '#/components/responses/403-Banned'
+        '404': # Not Found
+          $ref: '#/components/responses/404-PostNotFound'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
   /users/{user_uuid}/feed/{post_uuid}/likes:
     get:
       operationId: getLikes
@@ -731,6 +754,11 @@ components:
       items:
         $ref: '#/components/schemas/Comment'
 
+    Image:
+      type: string
+      format: binary
+      description: The webp image file
+
   #########################
   ## Response components ##
   #########################
@@ -756,6 +784,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Post'
+
+    200-Image:
+      description: Image retrieved correctly.
+      content:
+        image/webp:
+          schema:
+            $ref: '#/components/schemas/Image'
 
     200-PostList:
       description: List retrieved correctly.

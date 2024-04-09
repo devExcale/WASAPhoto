@@ -28,7 +28,7 @@ func (rt *_router) Handler() http.Handler {
 	r.DELETE("/me/feed/:post_uuid", rt.wrap(rt.deletePhoto))
 	r.GET("/users/:user_uuid/feed", rt.wrap(rt.getUserFeed))
 	r.GET("/users/:user_uuid/feed/:post_uuid", rt.wrap(rt.getPhoto))
-	r.GET("/users/:user_uuid/feed/:post_uuid/webp", rt.wrap(rt.getPostImage)) // TODO: api.yaml
+	r.GET("/users/:user_uuid/feed/:post_uuid/webp", rt.wrap(rt.getPhotoImage))
 
 	// Comment routes
 	r.GET("/users/:user_uuid/feed/:post_uuid/comments", rt.wrap(rt.getComments))

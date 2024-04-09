@@ -244,8 +244,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	w.WriteHeader(http.StatusOK)
 }
 
-// TODO: add to yaml
-func (rt *_router) getPostImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getPhotoImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-Type", "image/webp")
 
 	// Check authorization
