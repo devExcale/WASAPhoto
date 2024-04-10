@@ -107,6 +107,9 @@ paths:
                   properties:
                     caption:
                       type: string
+                      minLength: 0
+                      maxLength: 600
+                      pattern: '.*'
                       description: The caption of the post.
                       example: Working on this new project!
                       nullable: true
@@ -591,6 +594,10 @@ paths:
                 properties:
                   token:
                     type: string
+                    minLength: 16
+                    maxLength: 80
+                    description: The session token
+                    pattern: '[a-zA-Z0-9+/]+={,2}'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -653,16 +660,22 @@ components:
           description: The name of the API
           example: WasaPhoto
           pattern: 'WasaPhoto'
+          minLength: 9
+          maxLength: 9
         version:
           type: string
           description: The version of the API
           example: 1.0.0
           pattern: '\d+\.\d+.\d+'
+          minLength: 5
+          maxLength: 20
         status:
           type: string
           description: The status of the API
           example: Running
           pattern: '\w+'
+          minLength: 2
+          maxLength: 100
 
     UUID:
       type: string
@@ -695,8 +708,10 @@ components:
             URL of the user's profile picture.
             Note: all photos are encoded with webp format.
             Generally, the url will be of the form
-            `https://api.example.com/v1/users/{username}/assets/{photo_id}.webp`
-          example: https://api.example.com/v1/users/excale/assets/3e270f31-6eaa-4418-ab97-7ed22f51d446.webp
+            `/users/{user_uuid}/feed/{post_uuid}/webp`
+          example: /users/0ff6f09c-c701-4b1c-ad15-86cf3d7d51a3/feed/3e270f31-6eaa-4418-ab97-7ed22f51d446/webp
+          minLength: 0
+          maxLength: 2147483647
         num_posts:
           type: number
           description: The number of posts the user has
@@ -716,6 +731,8 @@ components:
     UserList:
       type: array
       description: A list of users
+      minItems: 0
+      maxItems: 2147483647
       items:
         $ref: '#/components/schemas/User'
 
@@ -759,6 +776,8 @@ components:
     PostList:
       type: array
       description: A list of posts
+      minItems: 0
+      maxItems: 2147483647
       items:
         $ref: '#/components/schemas/Post'
 
@@ -784,6 +803,8 @@ components:
     CommentList:
       type: array
       description: A list of comments
+      minItems: 0
+      maxItems: 2147483647
       items:
         $ref: '#/components/schemas/Comment'
 
