@@ -51,7 +51,20 @@ tags:
 ###############
 paths:
 
-  /me/feed:
+  /status:
+    get:
+      operationId: getStatus
+      summary: Get the API status
+      description: Returns the status of the API.
+      responses:
+        '200': # OK
+          description: The API is up and running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+
+  /me/feed/:
     get:
       operationId: getMyStream
       summary: Posts by the followed users
@@ -163,7 +176,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
-  /me/followed_users:
+  /me/followed_users/:
     get:
       operationId: getFollowedUsers
       summary: Get followed users
@@ -229,7 +242,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
-  /me/banned_users:
+  /me/banned_users/:
     get:
       operationId: getBannedUsers
       summary: Get banned users
@@ -292,10 +305,10 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
-  /users:
+  /users/:
     get:
       operationId: findUser
-      summary: Find a user by username
+      summary: Get users by username
       description: Returns the list of users whose username matches the given substring.
       tags: [ 'User' ]
       security:
@@ -340,7 +353,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
-  /users/{user_uuid}/feed:
+  /users/{user_uuid}/feed/:
     get:
       operationId: getUserFeed
       summary: Get all user's posts
@@ -408,7 +421,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
-  /users/{user_uuid}/feed/{post_uuid}/likes:
+  /users/{user_uuid}/feed/{post_uuid}/likes/:
     get:
       operationId: getLikes
       summary: Get users who liked a post
@@ -477,7 +490,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
-  /users/{user_uuid}/feed/{post_uuid}/comments:
+  /users/{user_uuid}/feed/{post_uuid}/comments/:
     get:
       operationId: getComments
       summary: Get a post's comments
@@ -549,7 +562,7 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
-  /login:
+  /session:
     post:
       operationId: doLogin
       summary: Logs in the user
@@ -569,7 +582,7 @@ paths:
                 username:
                   $ref: '#/components/schemas/Username'
       responses:
-        '200':
+        '201': # Created
           description: User log-in action successful
           content:
             application/json:
@@ -630,6 +643,26 @@ components:
   ## Schema components ##
   #######################
   schemas:
+
+    Status:
+      type: object
+      description: The status of the API
+      properties:
+        name:
+          type: string
+          description: The name of the API
+          example: WasaPhoto
+          pattern: 'WasaPhoto'
+        version:
+          type: string
+          description: The version of the API
+          example: 1.0.0
+          pattern: '\d+\.\d+.\d+'
+        status:
+          type: string
+          description: The status of the API
+          example: Running
+          pattern: '\w+'
 
     UUID:
       type: string

@@ -17,13 +17,6 @@ func (db *appdbimpl) GetUsersLikedPost(postUUID string) ([]User, error) {
 		return []User{}, err
 	}
 
-	// Close rows at the end
-	defer func() {
-		err = rows.Close()
-		if err != nil {
-		}
-	}()
-
 	// Map rows to users
 	for rows.Next() {
 
@@ -41,6 +34,12 @@ func (db *appdbimpl) GetUsersLikedPost(postUUID string) ([]User, error) {
 		}
 
 		slice = append(slice, user)
+	}
+
+	// Check for errors
+	err = rows.Err()
+	if err != nil {
+		return []User{}, err
 	}
 
 	// Create array from slice

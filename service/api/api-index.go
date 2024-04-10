@@ -7,20 +7,18 @@ import (
 )
 
 type AppInfo struct {
-	Name      string   `json:"name"`
-	Version   string   `json:"version"`
-	Status    string   `json:"status"`
-	Endpoints []string `json:"endpoints"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	Status  string `json:"status"`
 }
 
 func (rt *_router) getAppInfo(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
 	info := AppInfo{
-		Name:      "WASAPhoto",
-		Version:   "1.0.0",
-		Status:    "Running",
-		Endpoints: []string{"TODO"},
+		Name:    "WASAPhoto",
+		Version: "1.0.0",
+		Status:  "Running",
 	}
 
 	var err = json.NewEncoder(w).Encode(info)
@@ -28,4 +26,6 @@ func (rt *_router) getAppInfo(w http.ResponseWriter, _ *http.Request, _ httprout
 		rt.baseLogger.WithError(err).Error("cannot marshal app info")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
+
+	w.WriteHeader(http.StatusOK)
 }

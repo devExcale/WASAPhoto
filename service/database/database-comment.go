@@ -31,13 +31,6 @@ func (db *appdbimpl) GetCommentsByPost(postUUID string) ([]Comment, error) {
 		return comments, err
 	}
 
-	// Close rows at the end
-	defer func() {
-		err = rows.Close()
-		if err != nil {
-		}
-	}()
-
 	// Map rows to comments
 	for rows.Next() {
 
@@ -55,6 +48,12 @@ func (db *appdbimpl) GetCommentsByPost(postUUID string) ([]Comment, error) {
 		}
 
 		comments = append(comments, comment)
+	}
+
+	// Check for errors
+	err = rows.Err()
+	if err != nil {
+		return []Comment{}, err
 	}
 
 	return comments, nil

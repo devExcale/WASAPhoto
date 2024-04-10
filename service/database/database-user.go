@@ -94,13 +94,6 @@ func (db *appdbimpl) GetUsersWithUsernameSubstr(substring string, loggedUserUUID
 		return users, err
 	}
 
-	// Close rows at the end
-	defer func() {
-		err = rows.Close()
-		if err != nil {
-		}
-	}()
-
 	// Map rows to users
 	for rows.Next() {
 
@@ -118,6 +111,12 @@ func (db *appdbimpl) GetUsersWithUsernameSubstr(substring string, loggedUserUUID
 		}
 
 		users = append(users, user)
+	}
+
+	// Check for errors
+	err = rows.Err()
+	if err != nil {
+		return []User{}, err
 	}
 
 	return users, nil
