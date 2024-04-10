@@ -33,7 +33,7 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
+	"github.com/sirupsen/logrus"
 )
 
 // AppDatabase is the high level interface for the DB.
@@ -146,7 +146,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 	for tablename, createStmt := range tables {
 		err = createTableIfNotExists(db, tablename, createStmt)
 		if err != nil {
-			return nil, fmt.Errorf("error creating table %s: %w", tablename, err)
+			logrus.Errorf("error creating table %s: %v", tablename, err)
+			return nil, err
 		}
 	}
 
