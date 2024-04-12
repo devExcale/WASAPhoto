@@ -54,7 +54,7 @@ paths:
   /status:
     get:
       operationId: getStatus
-      summary: Get the API status
+      summary: API status
       description: Returns the status of the API.
       responses:
         '200': # OK
@@ -125,6 +125,8 @@ paths:
 
 
   /me/feed/{post_uuid}:
+    parameters:
+      - $ref: '#/components/parameters/pathPostUUID'
     delete:
       operationId: deletePhoto
       summary: Remove a post
@@ -132,8 +134,6 @@ paths:
       tags: [ 'Post' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathPostUUID'
       responses:
         '204': # No Content
           description: Post removed correctly
@@ -149,9 +149,9 @@ paths:
   /me/username:
     patch:
       operationId: setMyUserName
-      summary: Changes the user's username
+      summary: Update the user's username
       description: |-
-        Changes the user's username; if the username is already taken an error is returned.
+        Update the user's username; if the username is already taken an error is returned.
         The previous username won't be reserved and it will be available to other users for the taking.
       tags: [ 'User' ]
       security:
@@ -196,6 +196,8 @@ paths:
           $ref: '#/components/responses/500-InternalError'
 
   /me/followed_users/{user_uuid}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserUUID'
     put:
       operationId: followUser
       summary: Follow a user
@@ -206,8 +208,6 @@ paths:
       tags: [ 'Follow' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
       responses:
         '204': # No Content
           description: User followed correctly
@@ -231,8 +231,6 @@ paths:
         Removes the specified user from the current user's list of followed users.
         If the user doesn't belong to the list,
         the response will be as if the user has been removed correctly (i.e. 200).
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
       responses:
         '204': # No Content
           description: User unfollowed correctly
@@ -262,6 +260,8 @@ paths:
           $ref: '#/components/responses/500-InternalError'
 
   /me/banned_users/{user_uuid}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserUUID'
     put:
       operationId: banUser
       summary: Ban a user
@@ -271,8 +271,6 @@ paths:
       tags: [ 'Ban' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
       responses:
         '204': # No Content
           description: User banned correctly
@@ -294,8 +292,6 @@ paths:
       tags: [ 'Ban' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
       responses:
         '204': # No Content
           description: User unbanned correctly
@@ -335,6 +331,8 @@ paths:
           $ref: '#/components/responses/500-InternalError'
 
   /users/{user_uuid}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserUUID'
     get:
       operationId: getUserProfile
       summary: Get user profile
@@ -342,8 +340,6 @@ paths:
       tags: [ 'User' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
       responses:
         '200': # OK
           $ref: '#/components/responses/200-User'
@@ -364,8 +360,6 @@ paths:
       tags: [ 'Post' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
       responses:
         '200': # OK
           $ref: '#/components/responses/200-PostList'
@@ -379,6 +373,9 @@ paths:
           $ref: '#/components/responses/500-InternalError'
 
   /users/{user_uuid}/feed/{post_uuid}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserUUID'
+      - $ref: '#/components/parameters/pathPostUUID'
     get:
       operationId: getPhoto
       summary: Get a user's post
@@ -386,9 +383,6 @@ paths:
       tags: [ 'Post' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
-        - $ref: '#/components/parameters/pathPostUUID'
       responses:
         '200': # OK
           $ref: '#/components/responses/200-Post'
@@ -402,6 +396,9 @@ paths:
           $ref: '#/components/responses/500-InternalError'
 
   /users/{user_uuid}/feed/{post_uuid}/webp:
+    parameters:
+      - $ref: '#/components/parameters/pathUserUUID'
+      - $ref: '#/components/parameters/pathPostUUID'
     get:
       operationId: getPhotoImage
       summary: Get a post's image
@@ -409,9 +406,6 @@ paths:
       tags: [ 'Post' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
-        - $ref: '#/components/parameters/pathPostUUID'
       responses:
         '200': # OK
           $ref: '#/components/responses/200-Image'
@@ -425,6 +419,9 @@ paths:
           $ref: '#/components/responses/500-InternalError'
 
   /users/{user_uuid}/feed/{post_uuid}/likes/:
+    parameters:
+      - $ref: '#/components/parameters/pathUserUUID'
+      - $ref: '#/components/parameters/pathPostUUID'
     get:
       operationId: getLikes
       summary: Get users who liked a post
@@ -432,9 +429,6 @@ paths:
       tags: [ 'Like' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
-        - $ref: '#/components/parameters/pathPostUUID'
       responses:
         '200': # OK
           $ref: '#/components/responses/200-UserList'
@@ -453,9 +447,6 @@ paths:
       tags: [ 'Like' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
-        - $ref: '#/components/parameters/pathPostUUID'
       responses:
         '204': # No Content
           description: Like added correctly
@@ -476,9 +467,6 @@ paths:
       tags: [ 'Like' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
-        - $ref: '#/components/parameters/pathPostUUID'
       responses:
         '204': # No Content
           description: Like removed correctly
@@ -494,6 +482,9 @@ paths:
           $ref: '#/components/responses/500-InternalError'
 
   /users/{user_uuid}/feed/{post_uuid}/comments/:
+    parameters:
+      - $ref: '#/components/parameters/pathUserUUID'
+      - $ref: '#/components/parameters/pathPostUUID'
     get:
       operationId: getComments
       summary: Get a post's comments
@@ -501,9 +492,6 @@ paths:
       tags: [ 'Comment' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
-        - $ref: '#/components/parameters/pathPostUUID'
       responses:
         '200': # OK
           $ref: '#/components/responses/200-CommentList'
@@ -522,9 +510,6 @@ paths:
       tags: [ 'Comment' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
-        - $ref: '#/components/parameters/pathPostUUID'
       responses:
         '201': # Created
           $ref: '#/components/responses/201-Comment'
@@ -540,6 +525,10 @@ paths:
           $ref: '#/components/responses/500-InternalError'
 
   /users/{user_uuid}/feed/{post_uuid}/comments/{comment_uuid}:
+    parameters:
+      - $ref: '#/components/parameters/pathUserUUID'
+      - $ref: '#/components/parameters/pathPostUUID'
+      - $ref: '#/components/parameters/pathCommentUUID'
     delete:
       operationId: uncommentPhoto
       summary: Remove a comment
@@ -547,10 +536,6 @@ paths:
       tags: [ 'Comment' ]
       security:
         - Bearer: [ ]
-      parameters:
-        - $ref: '#/components/parameters/pathUserUUID'
-        - $ref: '#/components/parameters/pathPostUUID'
-        - $ref: '#/components/parameters/pathCommentUUID'
       responses:
         '204': # No Content
           description: Comment removed correctly
@@ -570,7 +555,7 @@ paths:
       operationId: doLogin
       summary: Logs in the user
       description: |
-        Logs in the user with the provided username.
+        Returns the session token for the user with the provided username.
         If the user does not exist, it will be created automatically.
       tags: [ 'Session' ]
       requestBody:
