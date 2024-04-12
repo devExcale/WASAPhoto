@@ -149,7 +149,7 @@ paths:
         '401': # Unauthorized
           $ref: '#/components/responses/401-Unauthorized'
         '404': # Not Found
-          $ref: '#/components/responses/404-PostNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -225,7 +225,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-UserNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
     delete:
@@ -246,7 +246,7 @@ paths:
         '401': # Unauthorized
           $ref: '#/components/responses/401-Unauthorized'
         '404': # Not Found
-          $ref: '#/components/responses/404-UserNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -286,7 +286,7 @@ paths:
         '401': # Unauthorized
           $ref: '#/components/responses/401-Unauthorized'
         '404': # Not Found
-          $ref: '#/components/responses/404-UserNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
     delete:
@@ -307,7 +307,7 @@ paths:
         '401': # Unauthorized
           $ref: '#/components/responses/401-Unauthorized'
         '404': # Not Found
-          $ref: '#/components/responses/404-UserNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -355,7 +355,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-UserNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -375,7 +375,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-UserNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -398,7 +398,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-PostNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -421,7 +421,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-PostNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -444,7 +444,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-PostNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
     put:
@@ -464,7 +464,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-PostNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
     delete:
@@ -484,7 +484,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-PostNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -507,7 +507,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-PostNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
     put:
@@ -527,7 +527,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-PostNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -553,7 +553,7 @@ paths:
         '403': # Forbidden
           $ref: '#/components/responses/403-Banned'
         '404': # Not Found
-          $ref: '#/components/responses/404-CommentNotFound'
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -867,29 +867,17 @@ components:
           schema:
             $ref: '#/components/schemas/Comment'
 
-    200-Success:
-      description: The operation was successful.
-
     400-BadRequest:
       description: The request was invalid or malformed (e.g. missing parameter).
 
     401-Unauthorized:
       description: The user is not logged in.
 
-    403-Forbidden:
-      description: The user is not allowed to perform the operation.
-
     403-Banned:
       description: The user has been banned by the given user.
 
-    404-UserNotFound:
-      description: The specified user doesn't exist.
-
-    404-PostNotFound:
-      description: The specified post doesn't exist.
-
-    404-CommentNotFound:
-      description: The specified comment doesn't exist.
+    404-ResourceNotFound:
+      description: The specified resource doesn't exist.
 
     409-Conflict:
       description: The operation couldn't be completed due to a conflict.
