@@ -99,6 +99,8 @@ paths:
           multipart/form-data:
             schema:
               type: object
+              description: A multipart request containing the image file and the post information.
+              required: [ file ]
               properties:
                 file:
                   type: string
@@ -167,8 +169,8 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - username
+              description: A json object containing the new username.
+              required: [ username ]
               properties:
                 username:
                   $ref: '#/components/schemas/Username'
@@ -569,8 +571,8 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - username
+              description: A json object containing the username.
+              required: [ username ]
               properties:
                 username:
                   $ref: '#/components/schemas/Username'
@@ -581,6 +583,7 @@ paths:
             application/json:
               schema:
                 type: object
+                description: A json object containing the session token.
                 properties:
                   token:
                     type: string
