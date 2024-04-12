@@ -18,6 +18,10 @@ servers:
   - url: /
 
 tags:
+  - name: Misc
+    description: |-
+      Endpoints that deal with miscellaneous operations.
+      No security is required to access these endpoints.
   - name: User
     description: |-
       Endpoints that deal with user-related operations.
@@ -56,6 +60,7 @@ paths:
       operationId: getStatus
       summary: API status
       description: Returns the status of the API.
+      tags: [ 'Misc' ]
       responses:
         '200': # OK
           description: The API is up and running
