@@ -1,6 +1,6 @@
 package database
 
-func (db *appdbimpl) IsBanned(issuerUUID, bannedUUID string) (bool, error) {
+func (db *appdbimpl) IsBanned(bannedUUID, issuerUUID string) (bool, error) {
 
 	var ban int
 	var err = db.c.QueryRow(qSelectIsBanned, issuerUUID, bannedUUID).Scan(&ban)

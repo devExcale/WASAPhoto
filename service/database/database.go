@@ -75,7 +75,7 @@ type AppDatabase interface {
 	DeletePost(postUUID string) error
 
 	// IsBanned checks if a user is banned by another user.
-	IsBanned(issuerUUID, bannedUUID string) (bool, error)
+	IsBanned(bannedUUID, issuerUUID string) (bool, error)
 
 	// GetBannedUsers retrieves all users banned by the given user.
 	GetBannedUsers(issuerUUID string) ([]User, error)

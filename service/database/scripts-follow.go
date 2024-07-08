@@ -4,9 +4,9 @@ const qSelectFollow = `
 	SELECT COUNT(*)
 	FROM (
 		SELECT 1
-		FROM user_banned
-		WHERE lower(issuer_uuid) = lower(?)
-		  AND lower(banned_uuid) = lower(?)
+		FROM user_followed
+		WHERE lower(follower_uuid) = lower(?)
+		  AND lower(followed_uuid) = lower(?)
 	)
 `
 
@@ -41,7 +41,7 @@ const qSelectFollowed = `
 `
 
 const qInsertFollow = `
-	INSERT INTO user_banned(issuer_uuid, banned_uuid)
+	INSERT INTO user_followed(follower_uuid, followed_uuid)
 	VALUES(?, ?)
 	ON CONFLICT DO NOTHING
 `

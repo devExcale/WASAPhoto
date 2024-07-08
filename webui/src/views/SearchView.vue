@@ -66,9 +66,13 @@ export default {
 		</div>
 
 		<div v-for="user in users" :key="user.uuid" class="row m-4 mb-3">
+
 			<RouterLink :to="`/profile/${user.uuid}`" class="">
 				{{ user.displayName }} - {{ user.username }}
 			</RouterLink>
+
+			<hr>
+
 		</div>
 
 	</div>

@@ -259,7 +259,7 @@ func (rt *_router) getPhotoImage(w http.ResponseWriter, r *http.Request, ps http
 
 	// Check if loggedUser is banned
 	var targetUserUUID = ps.ByName("user_uuid")
-	var isBanned, err = rt.db.IsBanned(targetUserUUID, loggedUser.UUID)
+	var isBanned, err = rt.db.IsBanned(loggedUser.UUID, targetUserUUID)
 	if err != nil {
 
 		// Unknown error
