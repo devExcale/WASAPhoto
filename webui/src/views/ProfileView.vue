@@ -203,6 +203,10 @@ export default {
 	},
 	computed: {
 
+		isLoggedUser() {
+			return this.userUUID === this.global.userUUID;
+		},
+
 		disableOnLoad() {
 			return {
 				'disabled': this.loading
@@ -256,7 +260,8 @@ export default {
 			</li>
 		</ul>
 
-		<div class="row mt-3" v-if="true"> <!-- TODO same user toolbar-->
+		<div class="row mt-3" v-if="!isLoggedUser">
+			<!-- Actions on other users -->
 			<nav class="nav nav-pills nav-fill justify-content-around">
 				<button :class="disableOnLoad" class="nav-link active m-1" @click="followAction">
 					{{ followBtnStr }}
@@ -264,6 +269,18 @@ export default {
 				<button :class="disableOnLoad" class="nav-link active m-1" @click="restrictAction">
 					{{ restrictBtnStr }}
 				</button>
+			</nav>
+		</div>
+
+		<div class="row mt-3" v-else>
+			<!-- Actions on logged user -->
+			<nav class="nav nav-pills nav-fill justify-content-around">
+				<RouterLink to="/follows" class="nav-link active m-1">
+					followed users
+				</RouterLink>
+				<RouterLink to="/restricts" class="nav-link active m-1">
+					restricted users
+				</RouterLink>
 			</nav>
 		</div>
 
