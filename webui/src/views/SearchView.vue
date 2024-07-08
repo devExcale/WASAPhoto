@@ -17,10 +17,10 @@ export default {
 
 		async doSearch() {
 
-			if (this.query.length < 3) {
-				this.users = [];
+			this.users = [];
+
+			if (this.query.length < 2)
 				return;
-			}
 
 			try {
 

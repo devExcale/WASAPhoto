@@ -3,7 +3,7 @@ import {User} from "@/utils/entities";
 import {axiosConf} from "@/utils/global";
 
 export default {
-	name: "FollowedView",
+	name: "RestrictedView",
 	data: function () {
 		return {
 			users: [],
@@ -16,7 +16,7 @@ export default {
 
 			try {
 
-				let response = await this.$axios.get('/me/followed_users/', axiosConf.value);
+				let response = await this.$axios.get('/me/banned_users/', axiosConf.value);
 				this.users = response.data.map(data => User.fromResponse(data));
 
 				console.log(response)
@@ -37,7 +37,7 @@ export default {
 			}
 		},
 
-		async unfollowUser(user) {
+		async unrestrictUser(user) {
 
 			if (this.loading)
 				return;
@@ -46,25 +46,25 @@ export default {
 
 			try {
 
-				await this.$axios.delete(`/me/followed_users/${user.uuid}`, axiosConf.value);
+				await this.$axios.delete(`/me/banned_users/${user.uuid}`, axiosConf.value);
 				this.users = this.users.filter(u => u.uuid !== user.uuid);
 
-				console.log(`User ${this.userUUID} unfollowed.`)
+				console.log(`User ${this.userUUID} unrestricted.`)
 
 			} catch (e) {
 
 				console.log(e)
 
 				if (e.response && e.response.status === 400) {
-					alert('Could not unfollow. Please try again later.');
+					alert('Could not unrestrict. Please try again later.');
 				} else if (e.response && e.response.status === 401) {
 					alert('You are not logged in. Try refreshing the page.');
 				} else if (e.response && e.response.status === 404) {
-					alert('Could not unfollow. The user doesn\'t exist.');
+					alert('Could not unrestrict. The user doesn\'t exist.');
 				} else if (e.response && e.response.status === 500) {
 					alert('Internal Server Error')
 				} else {
-					alert('Could not unfollow. Please try again later. (?)');
+					alert('Could not unrestrict. Please try again later. (?)');
 				}
 
 			}
@@ -83,12 +83,12 @@ export default {
 <template>
 	<div class="container-fluid">
 
-		<p class="h3 text-center">Followed Users</p>
+		<p class="h3 text-center">Restricted Users</p>
 
 		<hr>
 
 		<div v-if="users.length === 0" class="row m-4 mb-3">
-			<p class="h4 text-center">You don't follow any users.</p>
+			<p class="h4 text-center">You haven't restricted any users.</p>
 		</div>
 
 
@@ -97,7 +97,7 @@ export default {
 				{{ user.displayName }} - {{ user.username }}
 			</RouterLink>
 			<button :class="{'disabled': this.loading}" class="btn btn-outline-secondary" type="button"
-					@click="unfollowUser(user)">X
+					@click="unrestrictUser(user)">X
 			</button>
 		</div>
 

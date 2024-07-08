@@ -5,6 +5,7 @@ import ProfileView from '@/views/ProfileView.vue';
 import NewPostView from '@/views/NewPostView.vue';
 import SearchView from "@/views/SearchView.vue";
 import FollowedView from "@/views/FollowedView.vue";
+import RestrictedView from "@/views/RestrictedView.vue";
 
 const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -16,6 +17,7 @@ const router = createRouter({
 		{path: '/profile/:user_uuid', component: ProfileView},
 		{path: '/newPost', component: NewPostView},
 		{path: '/follows', component: FollowedView},
+		{path: '/restricts', component: RestrictedView},
 	]
 })
 
