@@ -1,0 +1,10 @@
+FROM node:lts as builder
+
+WORKDIR /src/webui
+COPY webui .
+
+RUN npm run build-prod
+
+FROM nginx:stable
+
+COPY --from=builder /src/webui/dist /usr/share/nginx/html
