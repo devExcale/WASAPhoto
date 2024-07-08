@@ -68,6 +68,9 @@ export default {
 			<div v-for="post in posts" :key="post.uuid" class="row m-4 mb-3">
 				<UserPost :post="post"/>
 			</div>
+			<div v-if="posts.length === 0" class="row m-4 mb-3">
+				<p class="h3 text-center">No posts here :/</p>
+			</div>
 		</div>
 	</div>
 </template>

@@ -51,14 +51,16 @@ export default {
 			<div class="row border-top border-primary" v-if="global.loggedIn">
 				<nav class="nav nav-pills nav-fill justify-content-around">
 					<!-- TODO: change material symbols to feather sprite -->
-					<a class="nav-link rounded-0 active material-symbols-rounded" href="/home">home</a>
-					<a class="nav-link rounded-0 material-symbols-rounded" href="#/">search</a>
-					<RouterLink to="/newPost"
-								class="nav-link rounded-0 material-symbols-rounded">
+					<RouterLink to="/home" class="nav-link rounded-0 material-symbols-rounded">
+						home
+					</RouterLink>
+					<RouterLink to="/search" class="nav-link rounded-0 material-symbols-rounded">
+						search
+					</RouterLink>
+					<RouterLink to="/newPost" class="nav-link rounded-0 material-symbols-rounded">
 						add_box
 					</RouterLink>
-					<RouterLink :to="`/profile/${global.userUUID}`"
-								class="nav-link rounded-0 material-symbols-rounded">
+					<RouterLink :to="`/profile/${global.userUUID}`" class="nav-link rounded-0 material-symbols-rounded">
 						person
 					</RouterLink>
 					<button class="nav-link rounded-0 material-symbols-rounded" @click.prevent="logout">logout</button>
