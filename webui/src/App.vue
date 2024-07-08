@@ -1,64 +1,67 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-</script>
 <script>
-export default {}
+import {global, updateLogin} from "@/utils/global.js";
+
+export default {
+	data() {
+		return {
+			global: global,
+		};
+	},
+	methods: {
+
+		async logout() {
+
+			localStorage.removeItem('token');
+			localStorage.removeItem('user_uuid');
+
+			updateLogin();
+
+			await this.$router.push('/login');
+		}
+
+	},
+	mounted() {
+
+		updateLogin()
+
+		if (!this.global.loggedIn)
+			this.$router.push('/login');
+
+	}
+}
 </script>
 
 <template>
+	<div class="container-fluid vh-100 bg-dark p-0">
+		<div
+			class="d-flex flex-column m-auto justify-content-center vh-100 col-md-4 border border-primary bg-white p-0">
 
-	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-		<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6" href="#/">Example App</a>
-		<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-	</header>
-
-	<div class="container-fluid">
-		<div class="row">
-			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-				<div class="position-sticky pt-3 sidebar-sticky">
-					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-						<span>General</span>
-					</h6>
-					<ul class="nav flex-column">
-						<li class="nav-item">
-							<RouterLink to="/" class="nav-link">
-								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
-								Home
-							</RouterLink>
-						</li>
-						<li class="nav-item">
-							<RouterLink to="/link1" class="nav-link">
-								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#layout"/></svg>
-								Menu item 1
-							</RouterLink>
-						</li>
-						<li class="nav-item">
-							<RouterLink to="/link2" class="nav-link">
-								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
-								Menu item 2
-							</RouterLink>
-						</li>
-					</ul>
-
-					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-						<span>Secondary menu</span>
-					</h6>
-					<ul class="nav flex-column">
-						<li class="nav-item">
-							<RouterLink :to="'/some/' + 'variable_here' + '/path'" class="nav-link">
-								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#file-text"/></svg>
-								Item 1
-							</RouterLink>
-						</li>
-					</ul>
+			<div class="row text-center bg-primary">
+				<div class="col text-light">
+					<h1>WASAPhoto</h1>
 				</div>
-			</nav>
+			</div>
 
-			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-				<RouterView />
-			</main>
+			<div class="row p-3 flex-grow-1 d-flex">
+				<div class="col d-flex justify-content-center">
+					<RouterView/>
+				</div>
+			</div>
+
+			<div class="row border-top border-primary" v-if="global.loggedIn">
+				<nav class="nav nav-pills nav-fill justify-content-around">
+					<!-- TODO: change material symbols to feather sprite -->
+					<a class="nav-link rounded-0 active material-symbols-rounded" href="/home">home</a>
+					<a class="nav-link rounded-0 material-symbols-rounded" href="#/">search</a>
+					<a class="nav-link rounded-0 material-symbols-rounded" href="#/">add_box</a>
+					<RouterLink :to="'/profile/' + global.userUUID"
+								class="nav-link rounded-0 material-symbols-rounded">
+						person
+					</RouterLink>
+					<button class="nav-link rounded-0 material-symbols-rounded" @click.prevent="logout">logout</button>
+				</nav>
+			</div>
+
 		</div>
 	</div>
 </template>

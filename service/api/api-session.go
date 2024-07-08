@@ -67,9 +67,11 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, _ httprouter.
 
 	// Compute authorization token
 	var respObj = struct {
-		Token string `json:"token"`
+		Token    string `json:"token"`
+		UserUUID string `json:"user_uuid"`
 	}{}
 	respObj.Token = base64.StdEncoding.EncodeToString([]byte(user.UUID))
+	respObj.UserUUID = user.UUID
 
 	var response []byte
 	response, err = json.Marshal(respObj)

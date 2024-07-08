@@ -591,6 +591,8 @@ paths:
                     maxLength: 80
                     description: The session token
                     pattern: '[a-zA-Z0-9+/]+={,2}'
+                  user_uuid:
+                    $ref: '#/components/schemas/UUID'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -694,7 +696,7 @@ components:
           type: string
           description: The user's display name.
           example: Emanuele Scaccia
-        url_profile_picture:
+        picture_url:
           type: string
           nullable: true
           description: |-
