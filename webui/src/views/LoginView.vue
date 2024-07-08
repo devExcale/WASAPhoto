@@ -2,6 +2,7 @@
 import {updateLogin} from "@/utils/global.js";
 
 export default {
+	name: "LoginView",
 	data() {
 		return {
 			username: '',

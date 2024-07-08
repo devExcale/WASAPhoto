@@ -115,3 +115,28 @@ func (rt *_router) getAuthorizedUser(r *http.Request) *database.User {
 
 	return &user
 }
+
+// getAuthorizedUserToken returns minimal information about the authenticated user.
+func (rt *_router) getAuthorizedUserToken(token string) *database.User {
+
+	// Prepare token
+	token = strings.TrimPrefix(token, "Bearer ")
+	if token == "" {
+		return nil
+	}
+
+	// Decode token
+	var uuidByte, err = base64.StdEncoding.DecodeString(token)
+	if err != nil {
+		return nil
+	}
+
+	// Get user
+	var user database.User
+	user, err = rt.db.GetUserBasic(string(uuidByte))
+	if err != nil {
+		return nil
+	}
+
+	return &user
+}

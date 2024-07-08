@@ -248,7 +248,7 @@ func (rt *_router) getPhotoImage(w http.ResponseWriter, r *http.Request, ps http
 	w.Header().Set("Content-Type", "image/webp")
 
 	// Check authorization
-	var loggedUser = rt.getAuthorizedUser(r)
+	var loggedUser = rt.getAuthorizedUserToken(r.URL.Query().Get("token"))
 	if loggedUser == nil {
 
 		// Token not provided or invalid

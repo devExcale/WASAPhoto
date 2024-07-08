@@ -1,44 +1,73 @@
 <script>
 import UserPost from "@/components/UserPost.vue";
+import {Post} from "@/utils/entities";
+import {axiosConf} from "@/utils/global";
 
 export default {
 	components: {UserPost},
 	data: function () {
 		return {
 			errormsg: null,
-			loading: false,
+			loading: true,
 			some_data: null,
+			posts: [],
 		}
 	},
+	props: {
+		userUUID: String,
+	},
 	methods: {
-		async refresh() {
+
+		async loadFeed() {
+
 			this.loading = true;
-			this.errormsg = null;
+
 			try {
-				let response = await this.$axios.get("/");
-				this.some_data = response.data;
+
+				let url = (this.userUUID) ? `/users/${this.userUUID}/feed/` : `/me/feed/`;
+				let response = await this.$axios.get(url, axiosConf.value);
+				this.posts = response.data.map((post) => Post.fromResponse(post));
+
+				console.log(response)
+				console.log(this.posts)
+
 			} catch (e) {
-				// this.errormsg = e.toString();
+
+				console.log(e)
+
+				if (e.response && e.response.status === 400) {
+					alert('Could not get feed. Please try again later.');
+				} else if (e.response && e.response.status === 401) {
+					alert('You are not logged in. Try refreshing the page.');
+				} else if (e.response && e.response.status === 500) {
+					alert('Internal Server Error');
+				} else {
+					alert('Could not get feed. Please try again later.');
+				}
+
+				return;
 			}
+
 			this.loading = false;
 		},
+
 	},
 	mounted() {
-		this.refresh()
+		this.loadFeed()
 	}
 }
 </script>
 
 <template>
 	<div>
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
-			<UserPost username="Cr4zy5ky_U"
-					  caption="Currently rewatching this"
-					  photo-url="https://imgsrv.crunchyroll.com/cdn-cgi/image/fit=contain,format=auto,quality=85,width=1200,height=675/catalog/crunchyroll/2d2c3381c9aabc3acb9551199f383ca3.jpe"
-					  post-id="1"
-					  created="2021-10-01 12:00:00"
-			/>
+		<div class="container-fluid" v-if="loading">
+			<p>Loading...</p>
+		</div>
+		<div v-else
+			 class="container-fluid">
+			<div v-for="post in posts" :key="post.uuid" class="row m-4 mb-3">
+				<UserPost :post="post"/>
+			</div>
 		</div>
 	</div>
 </template>

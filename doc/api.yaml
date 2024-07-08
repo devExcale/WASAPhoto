@@ -409,10 +409,11 @@ paths:
     get:
       operationId: getPhotoImage
       summary: Get a post's image
-      description: Returns the webp image file of the given post.
+      description: |-
+        Returns the webp image file of the given post.
+        This is the only method that requires the session token to be in the URL.
+        I know it is atroceous, but it is the easiest way to implement it.
       tags: [ 'Post' ]
-      security:
-        - Bearer: [ ]
       responses:
         '200': # OK
           $ref: '#/components/responses/200-Image'
@@ -640,6 +641,14 @@ components:
       example: 9a6a4415-9a50-4065-b345-8c22e8bb8c5f
       schema:
         $ref: '#/components/schemas/UUID'
+
+    queryToken:
+      name: token
+      in: query
+      required: true
+      description: The session token
+      schema:
+          type: string
 
   #######################
   ## Schema components ##

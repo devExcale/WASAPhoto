@@ -1,18 +1,21 @@
 <script>
-import {axiosConf} from "@/utils/global";
+import {axiosConf, global} from "@/utils/global";
 import {User} from "@/utils/entities";
+import FeedView from "@/views/FeedView.vue";
 
 export default {
+	components: {FeedView},
 	data() {
 		return {
 			userUUID: this.$route.params.user_uuid,
 			user: new User(),
 			loading: true,
+			global: global,
 		}
 	},
 	methods: {
 
-		async load() {
+		async loadProfile() {
 
 			this.loading = true;
 
@@ -44,7 +47,7 @@ export default {
 
 	},
 	mounted() {
-		this.load()
+		this.loadProfile()
 	},
 
 }
@@ -53,31 +56,44 @@ export default {
 <template>
 	<div class="container-fluid" v-if="!loading">
 
-		<div class="row">
+		<hr>
 
-			<img :src="user.pictureUrl" class="img-thumbnail" alt="...">
+		<div class="row d-flex">
 
-			<div class="row">
-				<span>{{ user.displayName }}</span>
-				<span>{{ user.username }}</span>
+			<img :src="user.pictureUrl" class="img-thumbnail col text-center" alt="User picture here...">
+
+			<div class="row flex-column col">
+				<span class="fw-bold">{{ user.displayName }}</span>
+				<span class="fst-italic">{{ user.username }}</span>
 			</div>
 
 		</div>
 
-		<ul class="row list-group list-group-horizontal">
-			<li class="list-group-item row">
-				<p># posts</p>
-				<p>{{ user.numPosts }}</p>
+		<ul class="row list-group list-group-horizontal mt-3">
+			<li class="list-group-item col text-center">
+				<p class="fw-bold h5">posts</p>
+				<span class="h5">{{ user.numPosts }}</span>
 			</li>
-			<li class="list-group-item row">
-				<p># followers</p>
-				<p>{{ user.numFollowers }}</p>
+			<li class="list-group-item col text-center">
+				<p class="fw-bold h5">followers</p>
+				<span class="h5">{{ user.numFollowers }}</span>
 			</li>
-			<li class="list-group-item row">
-				<p># following</p>
-				<p>{{ user.numFollowing }}</p>
+			<li class="list-group-item col text-center">
+				<p class="fw-bold h5">following</p>
+				<span class="h5">{{ user.numFollowing }}</span>
 			</li>
 		</ul>
+
+		<div class="row mt-3" v-if="true"> <!-- TODO same user toolbar-->
+			<nav class="nav nav-pills nav-fill justify-content-around">
+				<button class="nav-link active m-1" href="/home">follow</button>
+				<button class="nav-link active m-1" href="#/">block</button>
+			</nav>
+		</div>
+
+		<hr>
+
+		<FeedView :userUUID="user.uuid"/>
 
 	</div>
 	<div class="container-fluid" v-else>

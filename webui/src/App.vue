@@ -42,7 +42,7 @@ export default {
 				</div>
 			</div>
 
-			<div class="row p-3 flex-grow-1 d-flex">
+			<div class="row p-3 flex-grow-1 d-flex overflow-scroll">
 				<div class="col d-flex justify-content-center">
 					<RouterView/>
 				</div>
@@ -53,8 +53,11 @@ export default {
 					<!-- TODO: change material symbols to feather sprite -->
 					<a class="nav-link rounded-0 active material-symbols-rounded" href="/home">home</a>
 					<a class="nav-link rounded-0 material-symbols-rounded" href="#/">search</a>
-					<a class="nav-link rounded-0 material-symbols-rounded" href="#/">add_box</a>
-					<RouterLink :to="'/profile/' + global.userUUID"
+					<RouterLink to="/newPost"
+								class="nav-link rounded-0 material-symbols-rounded">
+						add_box
+					</RouterLink>
+					<RouterLink :to="`/profile/${global.userUUID}`"
 								class="nav-link rounded-0 material-symbols-rounded">
 						person
 					</RouterLink>

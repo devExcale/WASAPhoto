@@ -35,4 +35,17 @@ const axiosConf = computed(() => {
 	}
 })
 
-export {global, updateLogin, axiosConf}
+const axiosConfMultipart = computed(() => {
+
+	if (!global.loggedIn)
+		return {};
+
+	return {
+		headers: {
+			Authorization: `Bearer ${global.token}`,
+			'Content-Type': 'multipart/form-data',
+		}
+	}
+})
+
+export {global, updateLogin, axiosConf, axiosConfMultipart}
