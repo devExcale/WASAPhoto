@@ -412,7 +412,7 @@ paths:
       description: |-
         Returns the webp image file of the given post.
         This is the only method that requires the session token to be in the URL.
-        I know it is atroceous, but it is the easiest way to implement it.
+        I know it is atroceous
       tags: [ 'Post' ]
       responses:
         '200': # OK

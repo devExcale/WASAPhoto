@@ -9,6 +9,7 @@ export default {
 		return {
 			userUUID: this.$route.params.user_uuid,
 			user: new User(),
+			newUsername: '',
 			loading: true,
 			global: global,
 			followStatus: false,
@@ -33,18 +34,50 @@ export default {
 				console.log(e)
 
 				if (e.response && e.response.status === 403) {
-					alert('Banned') // TODO
+					alert('Could not load profile. You are restricted by the user.');
 				} else if (e.response && e.response.status === 404) {
-					alert('Not Found') // TODO
+					alert('Could not load profile. The user doesn\'t exist.');
 				} else if (e.response && e.response.status === 500) {
 					alert('Internal Server Error')
 				} else {
-					alert('Generic error.');
+					alert('Could not load profile. Please try again later. (?)');
 				}
 
 			}
 
 			this.loading = false;
+		},
+
+		async changeUsername() {
+
+			this.loading = true;
+
+			try {
+
+				let data = {username: this.newUsername};
+				await this.$axios.patch(`/me/username`, data, axiosConf.value);
+
+				console.log(this.user)
+
+			} catch (e) {
+
+				console.log(e)
+
+				if (e.response && e.response.status === 400) {
+					alert('Could not change username. Please try again later.');
+				} else if (e.response && e.response.status === 401) {
+					alert('You are not logged in. Try refreshing the page.');
+				} else if (e.response && e.response.status === 409) {
+					alert('The requested username is already taken.');
+				} else if (e.response && e.response.status === 500) {
+					alert('Internal Server Error')
+				} else {
+					alert('Could not change username. Please try again later. (?)');
+				}
+
+			}
+
+			await this.loadProfile();
 		},
 
 		async followAction() {
@@ -272,9 +305,9 @@ export default {
 			</nav>
 		</div>
 
-		<div class="row mt-3" v-else>
+		<div class="row" v-else>
 			<!-- Actions on logged user -->
-			<nav class="nav nav-pills nav-fill justify-content-around">
+			<nav class="nav nav-pills nav-fill justify-content-around mt-3">
 				<RouterLink to="/follows" class="nav-link active m-1">
 					followed users
 				</RouterLink>
@@ -282,6 +315,14 @@ export default {
 					restricted users
 				</RouterLink>
 			</nav>
+
+			<div class="input-group mt-3">
+				<input type="text" class="form-control" placeholder="New Username" v-model="newUsername">
+				<button class="btn btn-primary" type="button" @click="changeUsername" :class="disableOnLoad">
+					Change Username
+				</button>
+			</div>
+
 		</div>
 
 		<hr>
