@@ -7,6 +7,7 @@ export default {
 	data() {
 		return {
 			user: {},
+			likeStatus: false,
 		}
 	},
 	props: {
@@ -14,25 +15,108 @@ export default {
 		onDelete: Function,
 	},
 	computed: {
+
 		pictureUrl() {
 			return `http://localhost:3000${this.post.pictureUrl}?token=${global.token}`;
 		},
+
 		isAuthor() {
 			return this.post.authorUuid === global.userUUID;
 		},
+
+		likeBtnStyle() {
+			return this.likeStatus ? 'btn-primary' : 'btn-outline-primary';
+		},
 	},
 	methods: {
-		likePost() {
-			console.log('likePost');
+
+		async likePostAction() {
+
+			if (this.loading)
+				return;
+
+			this.loading = true;
+
+			if (this.likeStatus)
+				await this.unlikePost();
+			else
+				await this.likePost();
+
+			this.loading = false;
+
 		},
+
+		async likePost() {
+
+			try {
+
+				let url = `/users/${this.post.authorUuid}/feed/${this.post.uuid}/likes/`;
+				await this.$axios.put(url, {}, axiosConf.value);
+				this.likeStatus = true;
+				this.post.numLikes++;
+
+			} catch (e) {
+
+				console.log(e)
+
+				if (e.response && e.response.status === 400) {
+					alert('Could not like post. Please try again later.');
+				} else if (e.response && e.response.status === 401) {
+					alert('You are not logged in. Try refreshing the page.');
+				} else if (e.response && e.response.status === 403) {
+					alert('Could not like post. You are restricted by the user.');
+				} else if (e.response && e.response.status === 404) {
+					alert('Could not like post. The post doesn\'t exist.');
+				} else if (e.response && e.response.status === 500) {
+					alert('Internal Server Error')
+				} else {
+					alert('Could not like post. Please try again later. (?)');
+				}
+
+			}
+
+		},
+
+		async unlikePost() {
+
+			try {
+
+				let url = `/users/${this.post.authorUuid}/feed/${this.post.uuid}/likes/`;
+				await this.$axios.delete(url, axiosConf.value);
+				this.likeStatus = false;
+				this.post.numLikes--;
+
+			} catch (e) {
+
+				console.log(e)
+
+				if (e.response && e.response.status === 400) {
+					alert('Could not remove like. Please try again later.');
+				} else if (e.response && e.response.status === 401) {
+					alert('You are not logged in. Try refreshing the page.');
+				} else if (e.response && e.response.status === 403) {
+					alert('Could not remove like. You are restricted by the user.');
+				} else if (e.response && e.response.status === 404) {
+					alert('Could not remove like. The post doesn\'t exist.');
+				} else if (e.response && e.response.status === 500) {
+					alert('Internal Server Error')
+				} else {
+					alert('Could not remove like. Please try again later. (?)');
+				}
+
+			}
+
+		},
+
 		commentPost() {
 			console.log('commentPost');
 		},
+
 		async setUsername() {
 
 			try {
 
-				let response = await this.$axios.get(`/users/${this.userUUID}`, axiosConf.value);
+				let response = await this.$axios.get(`/users/${this.post.authorUuid}`, axiosConf.value);
 				this.user = User.fromResponse(response.data);
 
 			} catch (e) {
@@ -41,6 +125,7 @@ export default {
 
 			}
 		},
+
 		async deletePost() {
 
 			try {
@@ -49,7 +134,8 @@ export default {
 
 				console.log(`Post ${this.post.uuid} deleted.`)
 
-				this.onDelete(this.post);
+				if (this.onDelete)
+					this.onDelete(this.post);
 
 			} catch (e) {
 
@@ -92,7 +178,7 @@ export default {
 			<p class="card-text">{{ post.caption }}</p>
 
 			<div class="btn-group">
-				<button class="btn btn-primary material-symbols-rounded" @click="likePost">favorite</button>
+				<button :class="likeBtnStyle" class="btn material-symbols-rounded" @click="likePostAction">favorite</button>
 				<button class="btn btn-primary disabled">{{ post.numLikes }}</button>
 				<button class="btn btn-primary material-symbols-rounded" @click="commentPost">mode_comment</button>
 				<button class="btn btn-primary disabled">{{ post.numComments }}</button>
