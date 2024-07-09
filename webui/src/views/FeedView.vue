@@ -51,6 +51,10 @@ export default {
 			this.loading = false;
 		},
 
+		onPostDelete(post) {
+			this.posts = this.posts.filter((p) => p.uuid !== post.uuid);
+		},
+
 	},
 	mounted() {
 		this.loadFeed()
@@ -66,7 +70,7 @@ export default {
 		<div v-else
 			 class="container-fluid">
 			<div v-for="post in posts" :key="post.uuid" class="row m-4 mb-3">
-				<UserPost :post="post"/>
+				<UserPost :post="post" :on-delete="onPostDelete"/>
 			</div>
 			<div v-if="posts.length === 0" class="row m-4 mb-3">
 				<p class="h3 text-center">No posts here :/</p>
