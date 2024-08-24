@@ -156,6 +156,35 @@ export default {
 			}
 
 		},
+
+		async setMainPost() {
+
+			try {
+
+				let data = {"post_uuid": this.post.uuid};
+				await this.$axios.patch(`/me/profile_picture`, data, axiosConf.value);
+
+				console.log(`Post ${this.post.uuid} set as main.`)
+
+			} catch (e) {
+
+				console.log(e)
+
+				if (e.response && e.response.status === 400) {
+					alert('Could not set profile picture. Please try again later.');
+				} else if (e.response && e.response.status === 401) {
+					alert('You are not logged in. Try refreshing the page.');
+				} else if (e.response && e.response.status === 404) {
+					alert('Could not set profile picture. The post doesn\'t exist.');
+				} else if (e.response && e.response.status === 500) {
+					alert('Internal Server Error')
+				} else {
+					alert('Could not set profile picture. Please try again later. (?)');
+				}
+
+			}
+
+		},
 	},
 	mounted() {
 		this.setUsername();
@@ -180,9 +209,14 @@ export default {
 			<div class="btn-group">
 				<button :class="likeBtnStyle" class="btn material-symbols-rounded" @click="likePostAction">favorite</button>
 				<button class="btn btn-primary disabled">{{ post.numLikes }}</button>
+			</div>
+			<div class="btn-group m-2">
 				<button class="btn btn-primary material-symbols-rounded" @click="commentPost">mode_comment</button>
 				<button class="btn btn-primary disabled">{{ post.numComments }}</button>
-				<button class="btn btn-danger" @click="deletePost" v-if="isAuthor">delete</button>
+			</div>
+			<div class="btn-group" v-if="isAuthor">
+				<button class="btn btn-success" @click="setMainPost">Set as Main</button>
+				<button class="btn btn-danger" @click="deletePost">Delete</button>
 			</div>
 
 

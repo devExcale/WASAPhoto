@@ -156,9 +156,9 @@ paths:
   /me/username:
     patch:
       operationId: setMyUserName
-      summary: Update the user's username
+      summary: Update the user's names
       description: |-
-        Update the user's username; if the username is already taken an error is returned.
+        Update the user's username and/or display name; if the username is already taken an error is returned.
         The previous username won't be reserved and it will be available to other users for the taking.
       tags: [ 'User' ]
       security:
@@ -169,11 +169,45 @@ paths:
           application/json:
             schema:
               type: object
-              description: A json object containing the new username.
-              required: [ username ]
+              description: A json object containing the new username and/or display name.
               properties:
                 username:
                   $ref: '#/components/schemas/Username'
+                displayName:
+                  $ref: '#/components/schemas/DisplayName'
+      responses:
+        '204': # No Content
+          description: Names changed correctly
+        '400': # Bad Request
+          $ref: '#/components/responses/400-BadRequest'
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '409': # Conflict
+          description: The chosen username is already taken
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
+  /me/profile_picture:
+    patch:
+      operationId: setMyProfilePicture
+      summary: Update the user's profile picture
+      description: |-
+        Update the user's profile picture.
+        The profile picture must be selected from one of the user's posted photos.
+      tags: [ 'User' ]
+      security:
+        - Bearer: [ ]
+      requestBody:
+        description: Picture details
+        content:
+          application/json:
+            schema:
+              type: object
+              description: A json object containing the id of the photo's post.
+              required: [ post_uuid ]
+              properties:
+                post_uuid:
+                  $ref: '#/components/schemas/UUID'
       responses:
         '204': # No Content
           description: Username changed correctly
@@ -181,8 +215,8 @@ paths:
           $ref: '#/components/responses/400-BadRequest'
         '401': # Unauthorized
           $ref: '#/components/responses/401-Unauthorized'
-        '409': # Conflict
-          description: The chosen username is already taken
+        '404': # Not Found
+          $ref: '#/components/responses/404-ResourceNotFound'
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
@@ -695,6 +729,14 @@ components:
       minLength: 3
       maxLength: 20
 
+    DisplayName:
+      type: string
+      description: The user's display name.
+      example: Emanuele Scaccia
+      pattern: '.+'
+      minLength: 3
+      maxLength: 32
+
     User:
       type: object
       description: Information about a user
@@ -702,9 +744,7 @@ components:
         username:
           $ref: '#/components/schemas/Username'
         display_name:
-          type: string
-          description: The user's display name.
-          example: Emanuele Scaccia
+          $ref: '#/components/schemas/DisplayName'
         picture_url:
           type: string
           nullable: true

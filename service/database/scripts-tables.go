@@ -104,7 +104,7 @@ const qCreateViewUserFull = `
 			u.user_uuid,
 			u.username,
 			u.display_name,
-			u. picture_url,
+			u.picture_url,
 			COUNT(DISTINCT p.post_uuid) as num_posts,
 			COUNT(DISTINCT fd.follower_uuid) as num_followed,
 			COUNT(DISTINCT fg.followed_uuid) as num_following,

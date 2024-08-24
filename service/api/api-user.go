@@ -92,7 +92,8 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, _ httpr
 
 	// Parse request body
 	var body struct {
-		Username string `json:"username"`
+		Username    string `json:"username"`
+		DisplayName string `json:"displayName"`
 	}
 	var err = json.NewDecoder(r.Body).Decode(&body)
 
@@ -104,35 +105,66 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, _ httpr
 
 	}
 
-	// Check validity of new username
 	var newUsername = body.Username
-	if !util.IsValidUsername(newUsername) {
+	var newDisplayName = body.DisplayName
+	var lenNewUsername = len(newUsername)
+	var lenNewDisplayName = len(newDisplayName)
+
+	// Both fields are empty
+	if lenNewUsername == 0 && lenNewDisplayName == 0 {
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+
+		// Check validity of new username if present
+	} else if lenNewUsername > 0 && !util.IsValidUsername(newUsername) {
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+
+		// Check validity of new display name if present
+	} else if lenNewDisplayName > 0 && !util.IsValidDisplayName(newDisplayName) {
 
 		w.WriteHeader(http.StatusBadRequest)
 		return
 
 	}
 
-	// Check if the username is already taken
-	_, err = rt.db.GetUserFull(newUsername, database.FilterByUsername)
+	// Handle username
+	if lenNewUsername > 0 {
 
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		// Check if the username is already taken
+		_, err = rt.db.GetUserFull(newUsername, database.FilterByUsername)
 
-		// Generic error
-		ctx.Logger.WithError(err).Error("cannot get user")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 
-	} else if err == nil {
+			// Generic error
+			ctx.Logger.WithError(err).Error("cannot get user")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 
-		// Username is taken
-		w.WriteHeader(http.StatusConflict)
-		return
+		} else if err == nil {
+
+			// Username is taken
+			w.WriteHeader(http.StatusConflict)
+			return
+
+		}
+
+		// Update the username
+		user.Username = newUsername
 
 	}
 
-	// Update the username
-	user.Username = newUsername
+	// Handle display name
+	if lenNewDisplayName > 0 {
+
+		// Update the username
+		user.DisplayName = newDisplayName
+
+	}
+
+	// Update user object
 	err = rt.db.SetUser(user)
 
 	if err != nil {
@@ -146,6 +178,73 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, _ httpr
 
 	// Write the response
 	w.WriteHeader(http.StatusOK)
+}
+
+func (rt *_router) setMyProfilePicture(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {
+	w.Header().Set("content-type", "application/json")
+
+	// Check authorization
+	var loggedUser = rt.getAuthorizedUser(r)
+	if loggedUser == nil {
+
+		// Token not provided or invalid
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+
+	}
+
+	// Get post uuid
+	var body struct {
+		PostUUID string `json:"post_uuid"`
+	}
+	var err = json.NewDecoder(r.Body).Decode(&body)
+
+	// Cannot parse body
+	if err != nil {
+
+		w.WriteHeader(http.StatusBadRequest)
+		return
+
+	}
+
+	// Get post
+	var post database.Post
+	post, err = rt.db.GetPost(body.PostUUID)
+
+	if errors.Is(err, sql.ErrNoRows) {
+
+		// Post not found
+		w.WriteHeader(http.StatusNotFound)
+		return
+
+	} else if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot get post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	} else if post.AuthorUUID != loggedUser.UUID {
+
+		// Given user is not the author of the post
+		w.WriteHeader(http.StatusNotFound)
+		return
+
+	}
+
+	// Update the profile picture
+	loggedUser.PictureURL = post.ImageURL
+	err = rt.db.SetUser(loggedUser)
+
+	if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot delete post")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
 }
 
 func (rt *_router) findUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {

@@ -10,6 +10,7 @@ export default {
 			userUUID: this.$route.params.user_uuid,
 			user: new User(),
 			newUsername: '',
+			newDisplayName: '',
 			loading: true,
 			global: global,
 			followStatus: false,
@@ -54,7 +55,10 @@ export default {
 
 			try {
 
-				let data = {username: this.newUsername};
+				let data = {
+					username: this.newUsername,
+					displayName: this.newDisplayName,
+				};
 				await this.$axios.patch(`/me/username`, data, axiosConf.value);
 
 				console.log(this.user)
@@ -269,7 +273,13 @@ export default {
 
 		<div class="row d-flex">
 
-			<img :src="user.pictureUrl" class="img-thumbnail col text-center" alt="User picture here...">
+			<img v-if="user.pictureUrl"
+				 :src="user.pictureUrl"
+				 class="img-thumbnail col text-center" alt="User picture here...">
+
+			<div v-else class="col text-center">
+				<p>Select an image from your profile to show it here!</p>
+			</div>
 
 			<div class="row flex-column col">
 				<span class="fw-bold">{{ user.displayName }}</span>
@@ -305,22 +315,58 @@ export default {
 			</nav>
 		</div>
 
+		<!-- Actions on logged user -->
 		<div class="row" v-else>
-			<!-- Actions on logged user -->
+
 			<nav class="nav nav-pills nav-fill justify-content-around mt-3">
+				<button class="btn btn-primary nav-link active m-1" type="button" :class="disableOnLoad"
+						data-bs-toggle="modal" data-bs-target="#userSettingsModal">
+					Options
+				</button>
 				<RouterLink to="/follows" class="nav-link active m-1">
-					followed users
+					Followed Users
 				</RouterLink>
 				<RouterLink to="/restricts" class="nav-link active m-1">
-					restricted users
+					Restricted Users
 				</RouterLink>
 			</nav>
 
-			<div class="input-group mt-3">
-				<input type="text" class="form-control" placeholder="New Username" v-model="newUsername">
-				<button class="btn btn-primary" type="button" @click="changeUsername" :class="disableOnLoad">
-					Change Username
-				</button>
+			<!--  -->
+			<div class="modal fade" id="userSettingsModal" tabindex="-1">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+
+							<h1 class="modal-title fs-5" id="exampleModalLabel">Options</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"/>
+
+						</div>
+
+						<div class="modal-body">
+
+							<p class="text-center">
+								Here you can change your username and your display name! <br>
+								Keep in mind: if you leave a field blank it won't be updated.
+							</p>
+
+							<div class="input-group mb-3">
+								<div class="input-group-text">@</div>
+								<input type="text" class="form-control" placeholder="New Username"
+									   v-model="newUsername" />
+							</div>
+
+							<input type="text" class="form-control mb-3" placeholder="New Display Name"
+								   v-model="newDisplayName" />
+
+						</div>
+						<div class="modal-footer">
+
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="changeUsername">Save changes</button>
+
+						</div>
+					</div>
+				</div>
 			</div>
 
 		</div>

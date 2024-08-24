@@ -70,9 +70,11 @@ func (db *appdbimpl) SetUser(user *User) error {
 		user.UUID = genId.String()
 	}
 
-	_, err := db.c.Exec(qUpsertUser,
-		user.UUID, user.Username, user.DisplayName, "", // Insert parameters
-		user.Username, user.DisplayName, "") // Update parameters
+	_, err := db.c.Exec(
+		qUpsertUser,
+		user.UUID, user.Username, user.DisplayName, user.PictureURL, // Insert parameters
+		user.Username, user.DisplayName, user.PictureURL, // Update parameters
+	)
 
 	return err
 }
