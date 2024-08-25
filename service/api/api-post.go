@@ -66,8 +66,8 @@ func (rt *_router) getUserFeed(w http.ResponseWriter, r *http.Request, ps httpro
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization
-	var user = rt.getAuthorizedUser(r)
-	if user == nil {
+	var loggedUser = rt.getAuthorizedUser(r)
+	if loggedUser == nil {
 
 		// Token not provided or invalid
 		w.WriteHeader(http.StatusUnauthorized)
@@ -95,7 +95,7 @@ func (rt *_router) getUserFeed(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Check ban
 	var isBanned bool
-	isBanned, err = rt.db.IsBanned(user.UUID, targetUUID)
+	isBanned, err = rt.db.IsBanned(loggedUser.UUID, targetUUID)
 	if err != nil {
 
 		// Unknown error
@@ -113,7 +113,7 @@ func (rt *_router) getUserFeed(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Get posts
 	var posts []database.Post
-	posts, err = rt.db.GetPostsByUser(targetUUID)
+	posts, err = rt.db.GetPostsByUserWithLikes(targetUUID, loggedUser.UUID)
 	if err != nil {
 
 		// Unknown error
@@ -153,8 +153,8 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	w.Header().Set("content-type", "application/json")
 
 	// Check authorization
-	var user = rt.getAuthorizedUser(r)
-	if user == nil {
+	var loggedUser = rt.getAuthorizedUser(r)
+	if loggedUser == nil {
 
 		// Token not provided or invalid
 		w.WriteHeader(http.StatusUnauthorized)
@@ -182,7 +182,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Check ban
 	var isBanned bool
-	isBanned, err = rt.db.IsBanned(user.UUID, targetUUID)
+	isBanned, err = rt.db.IsBanned(loggedUser.UUID, targetUUID)
 	if err != nil {
 
 		// Unknown error
@@ -202,7 +202,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 	var postUUID = ps.ByName("post_uuid")
 	var post database.Post
 
-	post, err = rt.db.GetPost(postUUID)
+	post, err = rt.db.GetPostWithLike(postUUID, loggedUser.UUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// Post not found

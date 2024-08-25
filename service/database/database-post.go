@@ -23,6 +23,25 @@ func (db *appdbimpl) GetPost(postUUID string) (Post, error) {
 	return post, err
 }
 
+func (db *appdbimpl) GetPostWithLike(postUUID, userUUID string) (Post, error) {
+
+	var post = Post{}
+
+	// Get post
+	err := db.c.QueryRow(qSelectPostWithLike, postUUID, userUUID).Scan(
+		&post.UUID,
+		&post.AuthorUUID,
+		&post.Caption,
+		&post.ImageURL,
+		&post.NComments,
+		&post.NLikes,
+		&post.CreatedAt,
+		&post.LoggedUserLiked,
+	)
+
+	return post, err
+}
+
 func (db *appdbimpl) GetPostsByUser(userUUID string) ([]Post, error) {
 
 	var posts = make([]Post, 0)
@@ -63,6 +82,47 @@ func (db *appdbimpl) GetPostsByUser(userUUID string) ([]Post, error) {
 	return posts, nil
 }
 
+func (db *appdbimpl) GetPostsByUserWithLikes(authorUUID, loggedUUID string) ([]Post, error) {
+
+	var posts = make([]Post, 0)
+
+	// Get posts
+	rows, err := db.c.Query(qSelectPostsByUserWithLikes, authorUUID, loggedUUID)
+	if err != nil {
+		return posts, err
+	}
+
+	// Map rows to posts
+	for rows.Next() {
+
+		var post Post
+		err = rows.Scan(
+			&post.UUID,
+			&post.AuthorUUID,
+			&post.Caption,
+			&post.ImageURL,
+			&post.NComments,
+			&post.NLikes,
+			&post.CreatedAt,
+			&post.LoggedUserLiked,
+		)
+
+		if err != nil {
+			return posts, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	// Check for errors
+	err = rows.Err()
+	if err != nil {
+		return []Post{}, err
+	}
+
+	return posts, nil
+}
+
 func (db *appdbimpl) GetPostsByFollowed(userUUID string) ([]Post, error) {
 
 	var posts = make([]Post, 0)
@@ -85,6 +145,7 @@ func (db *appdbimpl) GetPostsByFollowed(userUUID string) ([]Post, error) {
 			&post.NComments,
 			&post.NLikes,
 			&post.CreatedAt,
+			&post.LoggedUserLiked,
 		)
 
 		if err != nil {

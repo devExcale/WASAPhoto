@@ -794,9 +794,9 @@ components:
           type: string
           description: |-
             The URL of the photo. Note: all photos are encoded with webp format.
-            Generally, the url will be of the form
-            `https://api.example.com/v1/users/{username}/assets/{post_id}.webp`
-          example: https://api.example.com/v1/users/excale/assets/3e270f31-6eaa-4418-ab97-7ed22f51d446.webp
+            Generally, the url will be of the form `/users/{user_uuid}/feed/{post_uuid}/webp`,
+            and it'll need authentication to be accessed.
+          example: /users/0ff6f09c-c701-4b1c-ad15-86cf3d7d51a3/feed/3e270f31-6eaa-4418-ab97-7ed22f51d446/webp
         caption:
           type: string
           nullable: true
@@ -812,10 +812,14 @@ components:
           description: The number of comments the post has.
           example: 4
           minimum: 0
-        timestamp:
+        created_at:
           type: string
-          description: The timestamp of the post, in `YYYY-MM-DD hh:mm:ss` format.
+          description: The post's creation timestamp, in `YYYY-MM-DD hh:mm:ss` format.
           example: 2021-01-01T00:00:00.000Z
+        logged_user_liked:
+          type: boolean
+          description: Whether the logged user liked the post.
+          example: true
 
     PostList:
       type: array

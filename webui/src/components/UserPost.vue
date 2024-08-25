@@ -8,7 +8,6 @@ export default {
 		return {
 			user: {},
 			pictureSrc: global.loadingGifSrc,
-			likeStatus: false,
 		}
 	},
 	props: {
@@ -23,7 +22,7 @@ export default {
 		},
 
 		likeBtnStyle() {
-			return this.likeStatus ? 'btn-primary' : 'btn-outline-primary';
+			return this.post.loggedUserLiked ? 'btn-primary' : 'btn-outline-primary';
 		},
 
 	},
@@ -44,7 +43,7 @@ export default {
 
 			this.loading = true;
 
-			if (this.likeStatus)
+			if (this.post.loggedUserLiked)
 				await this.unlikePost();
 			else
 				await this.likePost();
@@ -59,7 +58,7 @@ export default {
 
 				let url = `/users/${this.post.authorUuid}/feed/${this.post.uuid}/likes/`;
 				await this.$axios.put(url, {}, axiosConf.value);
-				this.likeStatus = true;
+				this.post.loggedUserLiked = true;
 				this.post.numLikes++;
 
 			} catch (e) {
@@ -90,7 +89,7 @@ export default {
 
 				let url = `/users/${this.post.authorUuid}/feed/${this.post.uuid}/likes/`;
 				await this.$axios.delete(url, axiosConf.value);
-				this.likeStatus = false;
+				this.post.loggedUserLiked = false;
 				this.post.numLikes--;
 
 			} catch (e) {

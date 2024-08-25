@@ -12,13 +12,14 @@ type User struct {
 }
 
 type Post struct {
-	UUID       string `json:"post_uuid"`
-	Caption    string `json:"caption"`
-	ImageURL   string `json:"image_url"`
-	CreatedAt  string `json:"created_at"`
-	AuthorUUID string `json:"author_uuid"`
-	NLikes     int    `json:"num_likes"`
-	NComments  int    `json:"num_comments"`
+	UUID            string `json:"post_uuid"`
+	Caption         string `json:"caption"`
+	ImageURL        string `json:"image_url"`
+	CreatedAt       string `json:"created_at"`
+	AuthorUUID      string `json:"author_uuid"`
+	NLikes          int    `json:"num_likes"`
+	NComments       int    `json:"num_comments"`
+	LoggedUserLiked bool   `json:"logged_user_liked"`
 }
 
 type Comment struct {

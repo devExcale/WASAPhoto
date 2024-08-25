@@ -58,8 +58,14 @@ type AppDatabase interface {
 	// GetPost retrieves the post with the given UUID.
 	GetPost(postUUID string) (Post, error)
 
+	// GetPostWithLike retrieves the post with the given UUID and checks if the logged user liked it.
+	GetPostWithLike(postUUID, userUUID string) (Post, error)
+
 	// GetPostsByUser retrieves all posts by the given user.
 	GetPostsByUser(userUUID string) ([]Post, error)
+
+	// GetPostsByUserWithLikes retrieves all posts by the given user and checks if the logged user liked them.
+	GetPostsByUserWithLikes(authorUUID, loggedUUID string) ([]Post, error)
 
 	// GetPostsByFollowed retrieves all posts by the users followed by the given user.
 	GetPostsByFollowed(userUUID string) ([]Post, error)

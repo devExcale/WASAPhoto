@@ -42,6 +42,7 @@ class Post {
 		numLikes = 0,
 		numComments = 0,
 		timestamp = null,
+		loggedUserLiked = false,
 	) {
 		this.uuid = uuid
 		this.authorUuid = authorUuid
@@ -50,6 +51,7 @@ class Post {
 		this.numLikes = numLikes
 		this.numComments = numComments
 		this.timestamp = timestamp
+		this.loggedUserLiked = loggedUserLiked
 	}
 
 	static fromResponse(resp) {
@@ -60,7 +62,8 @@ class Post {
 			resp.caption,
 			resp.num_likes,
 			resp.num_comments,
-			resp.timestamp,
+			resp.created_at,
+			resp.logged_user_liked,
 		)
 	}
 }
