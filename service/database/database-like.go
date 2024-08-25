@@ -62,3 +62,10 @@ func (db *appdbimpl) DeleteLike(postUUID, userUUID string) error {
 
 	return err
 }
+
+func (db *appdbimpl) DeletePostLikes(postUUID string) error {
+
+	_, err := db.c.Exec(qDeletePostLikes, postUUID)
+
+	return err
+}

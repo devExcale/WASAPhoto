@@ -438,8 +438,19 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
-	// Delete post
-	err = rt.db.DeletePost(postUUID)
+	// Delete post's comments
+	err = rt.db.DeletePostComments(postUUID)
+
+	if err == nil {
+		// Delete post's likes
+		err = rt.db.DeletePostLikes(postUUID)
+	}
+
+	if err == nil {
+		// Delete post
+		err = rt.db.DeletePost(postUUID)
+	}
+
 	if err != nil {
 
 		// Unknown error
@@ -449,6 +460,4 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
-	// Write the response
-	w.WriteHeader(http.StatusOK)
 }

@@ -37,3 +37,8 @@ const qDeleteLike = `
 	WHERE lower(post_uuid) = lower(?)
 	  AND lower(user_uuid) = lower(?)
 `
+
+const qDeletePostLikes = `
+	DELETE FROM post_like
+	WHERE lower(post_uuid) = lower(?)
+`

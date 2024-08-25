@@ -92,3 +92,10 @@ func (db *appdbimpl) DeleteComment(commentUUID string) error {
 
 	return err
 }
+
+func (db *appdbimpl) DeletePostComments(postUUID string) error {
+
+	_, err := db.c.Exec(qDeletePostComments, postUUID)
+
+	return err
+}
