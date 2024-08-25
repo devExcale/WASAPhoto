@@ -1,5 +1,5 @@
 <script>
-import {axiosConf, global} from "@/utils/global";
+import {axiosConf, loadPicture, global} from "@/utils/global";
 import {User} from "@/utils/entities";
 import FeedView from "@/views/FeedView.vue";
 
@@ -11,6 +11,7 @@ export default {
 			user: new User(),
 			newUsername: '',
 			newDisplayName: '',
+			profilePictureSrc: global.loadingGifSrc,
 			loading: true,
 			global: global,
 			followStatus: false,
@@ -34,7 +35,9 @@ export default {
 
 				console.log(e)
 
-				if (e.response && e.response.status === 403) {
+				if (e.response && e.response.status === 401) {
+					alert('You are not logged in. Try refreshing the page.');
+				} else if (e.response && e.response.status === 403) {
 					alert('Could not load profile. You are restricted by the user.');
 				} else if (e.response && e.response.status === 404) {
 					alert('Could not load profile. The user doesn\'t exist.');
@@ -45,6 +48,21 @@ export default {
 				}
 
 			}
+
+			await this.reloadProfilePicture();
+
+			this.loading = false;
+		},
+
+		async reloadProfilePicture(src) {
+
+			this.loading = true;
+			this.profilePictureSrc = global.loadingGifSrc;
+
+			if (src)
+				this.profilePictureSrc = await loadPicture(src);
+			else if (this.user.pictureUrl)
+				this.profilePictureSrc = await loadPicture(this.user.pictureUrl);
 
 			this.loading = false;
 		},
@@ -235,6 +253,13 @@ export default {
 		},
 
 	},
+	provide() {
+		return {
+
+			onChangeProfilePicture: this.reloadProfilePicture,
+
+		}
+	},
 	mounted() {
 		this.loadProfile()
 	},
@@ -273,8 +298,9 @@ export default {
 
 		<div class="row d-flex">
 
-			<img v-if="user.pictureUrl"
-				 :src="user.pictureUrl"
+			<img v-if="this.profilePictureSrc"
+				 :src="this.profilePictureSrc"
+				 @set-profile-picture="src => reloadProfilePicture(src)"
 				 class="img-thumbnail col text-center" alt="User picture here...">
 
 			<div v-else class="col text-center">

@@ -1,12 +1,13 @@
 <script>
 import {Post, User} from "@/utils/entities";
-import {axiosConf, global} from "@/utils/global";
+import {axiosConf, loadPicture, global} from "@/utils/global";
 
 export default {
 	name: "UserPost",
 	data() {
 		return {
 			user: {},
+			pictureSrc: global.loadingGifSrc,
 			likeStatus: false,
 		}
 	},
@@ -14,11 +15,8 @@ export default {
 		post: Post,
 		onDelete: Function,
 	},
+	inject: ['onChangeProfilePicture'],
 	computed: {
-
-		pictureUrl() {
-			return `http://localhost:3000${this.post.pictureUrl}?token=${global.token}`;
-		},
 
 		isAuthor() {
 			return this.post.authorUuid === global.userUUID;
@@ -27,8 +25,17 @@ export default {
 		likeBtnStyle() {
 			return this.likeStatus ? 'btn-primary' : 'btn-outline-primary';
 		},
+
 	},
 	methods: {
+
+		async reloadPicture() {
+
+			this.pictureSrc = global.loadingGifSrc;
+
+			if (this.post.pictureUrl)
+				this.pictureSrc = await loadPicture(this.post.pictureUrl);
+		},
 
 		async likePostAction() {
 
@@ -184,10 +191,14 @@ export default {
 
 			}
 
+			if (this.onChangeProfilePicture)
+				await this.onChangeProfilePicture(this.post.pictureUrl);
+
 		},
 	},
 	mounted() {
 		this.setUsername();
+		this.reloadPicture();
 	}
 }
 </script>
@@ -195,7 +206,7 @@ export default {
 <template>
 	<div class="card p-0 m-0" :key="post.uuid">
 
-		<img :src="pictureUrl" class="card-img-top" alt="Picture here...">
+		<img :src="pictureSrc" class="card-img-top" alt="Picture here...">
 		<div class="card-body">
 
 
