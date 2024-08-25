@@ -786,10 +786,12 @@ components:
       properties:
         uuid:
           $ref: '#/components/schemas/UUID'
+        author_uuid:
+          $ref: '#/components/schemas/UUID'
         username:
-          type: string
-          description: The username of the user who made the post.
-          example: excale
+          $ref: '#/components/schemas/Username'
+        display_name:
+          $ref: '#/components/schemas/DisplayName'
         url_photo:
           type: string
           description: |-

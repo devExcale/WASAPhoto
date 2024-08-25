@@ -1,12 +1,11 @@
 <script>
-import {Post, User} from "@/utils/entities";
+import {Post} from "@/utils/entities";
 import {axiosConf, loadPicture, global} from "@/utils/global";
 
 export default {
 	name: "UserPost",
 	data() {
 		return {
-			user: {},
 			pictureSrc: global.loadingGifSrc,
 		}
 	},
@@ -118,20 +117,6 @@ export default {
 			console.log('commentPost');
 		},
 
-		async setUsername() {
-
-			try {
-
-				let response = await this.$axios.get(`/users/${this.post.authorUuid}`, axiosConf.value);
-				this.user = User.fromResponse(response.data);
-
-			} catch (e) {
-
-				console.log(e)
-
-			}
-		},
-
 		async deletePost() {
 
 			try {
@@ -196,7 +181,6 @@ export default {
 		},
 	},
 	mounted() {
-		this.setUsername();
 		this.reloadPicture();
 	}
 }
@@ -210,7 +194,7 @@ export default {
 
 
 			<RouterLink :to="`/profile/${post.authorUuid}`" class="link-primary">
-				{{ user.displayName || post.authorUuid }}
+				{{ post.authorDisplayName || post.authorUsername || post.authorUuid }}
 			</RouterLink>
 			<span class="card-title"></span>
 			<span class="card-subtitle mb-2 text-body-secondary">{{ post.timestamp }}</span>

@@ -31,6 +31,8 @@ func (db *appdbimpl) GetPostWithLike(postUUID, userUUID string) (Post, error) {
 	err := db.c.QueryRow(qSelectPostWithLike, postUUID, userUUID).Scan(
 		&post.UUID,
 		&post.AuthorUUID,
+		&post.AuthorUsername,
+		&post.AuthorDisplayName,
 		&post.Caption,
 		&post.ImageURL,
 		&post.NComments,
@@ -59,6 +61,8 @@ func (db *appdbimpl) GetPostsByUser(userUUID string) ([]Post, error) {
 		err = rows.Scan(
 			&post.UUID,
 			&post.AuthorUUID,
+			&post.AuthorUsername,
+			&post.AuthorDisplayName,
 			&post.Caption,
 			&post.ImageURL,
 			&post.NComments,
@@ -99,6 +103,8 @@ func (db *appdbimpl) GetPostsByUserWithLikes(authorUUID, loggedUUID string) ([]P
 		err = rows.Scan(
 			&post.UUID,
 			&post.AuthorUUID,
+			&post.AuthorUsername,
+			&post.AuthorDisplayName,
 			&post.Caption,
 			&post.ImageURL,
 			&post.NComments,
@@ -140,6 +146,8 @@ func (db *appdbimpl) GetPostsByFollowed(userUUID string) ([]Post, error) {
 		err = rows.Scan(
 			&post.UUID,
 			&post.AuthorUUID,
+			&post.AuthorUsername,
+			&post.AuthorDisplayName,
 			&post.Caption,
 			&post.ImageURL,
 			&post.NComments,

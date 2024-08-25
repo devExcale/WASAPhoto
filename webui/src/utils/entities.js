@@ -20,6 +20,7 @@ class User {
 	}
 
 	static fromResponse(resp) {
+		// noinspection JSUnresolvedReference
 		return new User(
 			resp.user_uuid,
 			resp.username,
@@ -37,6 +38,8 @@ class Post {
 	constructor(
 		uuid = '',
 		authorUuid = '',
+		authorUsername = '',
+		authorDisplayName = '',
 		pictureUrl = null,
 		caption = '',
 		numLikes = 0,
@@ -46,6 +49,8 @@ class Post {
 	) {
 		this.uuid = uuid
 		this.authorUuid = authorUuid
+		this.authorUsername = authorUsername
+		this.authorDisplayName = authorDisplayName
 		this.pictureUrl = pictureUrl
 		this.caption = caption
 		this.numLikes = numLikes
@@ -55,9 +60,12 @@ class Post {
 	}
 
 	static fromResponse(resp) {
+		// noinspection JSUnresolvedReference
 		return new Post(
 			resp.post_uuid,
 			resp.author_uuid,
+			resp.author_username,
+			resp.author_display_name,
 			resp.image_url,
 			resp.caption,
 			resp.num_likes,

@@ -18,6 +18,8 @@ const qSelectPostWithLike = `
 	SELECT
 		p.post_uuid,
 		p.author_uuid,
+		p.author_username,
+		p.author_display_name,
 		p.caption,
 		p.image_url,
 		p.num_comments,
@@ -38,6 +40,8 @@ const qSelectPostsByUser = `
 	SELECT
 		post_uuid,
 		author_uuid,
+		author_username,
+		author_display_name,
 		caption,
 		image_url,
 		num_comments,
@@ -53,6 +57,8 @@ const qSelectPostsByUserWithLikes = `
 	SELECT
 		p.post_uuid,
 		p.author_uuid,
+		p.author_username,
+		p.author_display_name,
 		p.caption,
 		p.image_url,
 		p.num_comments,
@@ -74,6 +80,8 @@ const qSelectPostsByFollowed = `
 	SELECT
 		p.post_uuid,
 		p.author_uuid,
+		p.author_username,
+		p.author_display_name,
 		p.caption,
 		p.image_url,
 		p.num_comments,

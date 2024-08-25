@@ -126,6 +126,8 @@ const qCreateViewPostFull = `
 		SELECT
 			p.post_uuid,
 			p.author_uuid,
+			u.username as author_username,
+			u.display_name as author_display_name,
 			p.caption,
 			'/users/' || p.author_uuid || '/feed/' || p.post_uuid || '/webp' as image_url,
 			COUNT(DISTINCT l.user_uuid) as num_likes,
@@ -133,6 +135,8 @@ const qCreateViewPostFull = `
 			p.ts_created
 		FROM
 			post p
+		JOIN
+			user u ON u.user_uuid = p.author_uuid
 		LEFT JOIN
 			post_like l ON l.post_uuid = p.post_uuid
 		LEFT JOIN
