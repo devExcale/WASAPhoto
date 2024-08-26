@@ -27,9 +27,17 @@ const qSelectBanned = `
 const qInsertBan = `
 	INSERT INTO user_banned(issuer_uuid, banned_uuid)
 	VALUES(?, ?)
-	ON CONFLICT DO NOTHING`
+	ON CONFLICT DO NOTHING
+`
 
 const qDeleteBan = `
 	DELETE FROM user_banned
 	WHERE lower(issuer_uuid) = lower(?)
-	  AND lower(banned_uuid) = lower(?)`
+	  AND lower(banned_uuid) = lower(?)
+`
+
+const qDeleteBansByOnUser = `
+	DELETE FROM user_banned
+	WHERE lower(banned_uuid) = lower(?1)
+	 OR lower(issuer_uuid) = lower(?1)
+`

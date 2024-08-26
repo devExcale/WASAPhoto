@@ -294,3 +294,31 @@ func (rt *_router) findUser(w http.ResponseWriter, r *http.Request, _ httprouter
 	// Write the response
 	httpSimpleResponse(http.StatusOK, response, w, ctx)
 }
+
+func (rt *_router) deleteSelfUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {
+	w.Header().Set("content-type", "application/json")
+
+	// Check authorization
+	var loggedUser = rt.getAuthorizedUser(r)
+	if loggedUser == nil {
+
+		// Token not provided or invalid
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+
+	}
+
+	// Delete post
+	var err = rt.db.DeleteUser(loggedUser.UUID, nil)
+
+	if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot delete user")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

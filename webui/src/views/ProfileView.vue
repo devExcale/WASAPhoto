@@ -18,6 +18,7 @@ export default {
 			restrictStatus: false,
 		}
 	},
+	inject: ['logout'],
 	methods: {
 
 		async loadProfile() {
@@ -100,6 +101,29 @@ export default {
 			}
 
 			await this.loadProfile();
+		},
+
+		async deleteProfile() {
+
+			try {
+
+				await this.$axios.delete(`/me`, axiosConf.value);
+
+				await this.logout();
+
+			} catch (e) {
+
+				console.log(e)
+
+				if (e.response && e.response.status === 401) {
+					alert('You are not logged in. Try refreshing the page.');
+				} else if (e.response && e.response.status === 500) {
+					alert('Internal Server Error')
+				} else {
+					alert('Could not delete profile. Please try again later. (?)');
+				}
+
+			}
 		},
 
 		async followAction() {
@@ -387,6 +411,7 @@ export default {
 						</div>
 						<div class="modal-footer">
 
+							<button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="deleteProfile">Delete profile</button>
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 							<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="changeUsername">Save changes</button>
 

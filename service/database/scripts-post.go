@@ -120,3 +120,8 @@ const qDeletePost = `
 	DELETE FROM post
 	WHERE lower(post_uuid) = lower(?)
 `
+
+const qDeletePostsByUser = `
+	DELETE FROM post
+	WHERE lower(author_uuid) = lower(?)
+`

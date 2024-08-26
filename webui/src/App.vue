@@ -20,6 +20,11 @@ export default {
 		}
 
 	},
+	provide() {
+		return {
+			logout: this.logout,
+		};
+	},
 	mounted() {
 
 		updateLogin()

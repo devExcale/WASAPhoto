@@ -46,3 +46,8 @@ const qDeletePostComments = `
 		WHERE lower(post_uuid) = lower(?)
 	)
 `
+
+const qDeleteCommentsByUser = `
+	DELETE FROM post_comment
+	WHERE lower(author_uuid) = lower(?)
+`

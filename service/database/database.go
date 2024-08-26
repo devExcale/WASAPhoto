@@ -50,7 +50,7 @@ type AppDatabase interface {
 	SetUser(user *User) error
 
 	// DeleteUser removes the user with the given UUID.
-	DeleteUser(userUUID string) error
+	DeleteUser(userUUID string, tx *sql.Tx) error
 
 	// GetUsersWithUsernameSubstr retrieves all users with a username containing the given substring.
 	GetUsersWithUsernameSubstr(substring string, loggedUserUUID string) ([]User, error)

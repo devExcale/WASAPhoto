@@ -153,6 +153,22 @@ paths:
         '500': # Internal Error
           $ref: '#/components/responses/500-InternalError'
 
+  /me:
+    delete:
+      operationId: deleteProfile
+      summary: Delete the user's profile
+      description: Delete the user's profile and all related data.
+      tags: [ 'User' ]
+      security:
+        - Bearer: [ ]
+      responses:
+        '204': # No Content
+          description: Profile deleted correctly
+        '401': # Unauthorized
+          $ref: '#/components/responses/401-Unauthorized'
+        '500': # Internal Error
+          $ref: '#/components/responses/500-InternalError'
+
   /me/username:
     patch:
       operationId: setMyUserName

@@ -51,3 +51,9 @@ const qDeleteFollow = `
 	WHERE lower(follower_uuid) = lower(?)
 	  AND lower(followed_uuid) = lower(?)
 `
+
+const qDeleteUserFollowerds = `
+	DELETE FROM user_followed
+	WHERE lower(follower_uuid) = lower(?1)
+	  OR lower(followed_uuid) = lower(?1)
+`

@@ -21,6 +21,7 @@ func (rt *_router) Handler() http.Handler {
 	r.GET("/users/:user_uuid", rt.wrap(rt.getUserProfile))
 	r.PATCH("/me/username", rt.wrap(rt.setMyUserName))
 	r.PATCH("/me/profile_picture", rt.wrap(rt.setMyProfilePicture))
+	r.DELETE("/me", rt.wrap(rt.deleteSelfUser))
 
 	// Post routes
 	r.GET("/me/feed/", rt.wrap(rt.getMyStream))
