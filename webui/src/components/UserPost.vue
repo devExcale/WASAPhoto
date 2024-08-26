@@ -1,9 +1,11 @@
 <script>
 import {Post} from "@/utils/entities";
 import {axiosConf, loadPicture, global} from "@/utils/global";
+import CommentModal from "@/components/CommentModal.vue";
 
 export default {
 	name: "UserPost",
+	components: {CommentModal},
 	data() {
 		return {
 			pictureSrc: global.loadingGifSrc,
@@ -205,7 +207,11 @@ export default {
 				<button class="btn btn-primary disabled">{{ post.numLikes }}</button>
 			</div>
 			<div class="btn-group m-2">
-				<button class="btn btn-primary material-symbols-rounded" @click="commentPost">mode_comment</button>
+				<button class="btn btn-primary material-symbols-rounded"
+						data-bs-toggle="modal"
+						:data-bs-target="'#comments-' + post.uuid">
+					mode_comment
+				</button>
 				<button class="btn btn-primary disabled">{{ post.numComments }}</button>
 			</div>
 			<div class="btn-group" v-if="isAuthor">
@@ -215,6 +221,8 @@ export default {
 
 
 		</div>
+
+		<CommentModal :post="post"/>
 
 	</div>
 </template>

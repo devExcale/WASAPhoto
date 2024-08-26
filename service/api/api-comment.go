@@ -212,6 +212,29 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	}
 
+	// Return created comment
+	var response []byte
+	response, err = json.Marshal(comment)
+	if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot marshal response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
+	// Write response
+	_, err = w.Write(response)
+	if err != nil {
+
+		// Unknown error
+		ctx.Logger.WithError(err).Error("cannot write response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+
+	}
+
 	w.WriteHeader(http.StatusCreated)
 }
 

@@ -76,4 +76,31 @@ class Post {
 	}
 }
 
-export {User, Post}
+class Comment {
+	constructor(
+		uuid = '',
+		postUuid = '',
+		authorUuid = '',
+		comment = '',
+		createdAt = null,
+	) {
+		this.uuid = uuid
+		this.postUuid = postUuid
+		this.authorUuid = authorUuid
+		this.comment = comment
+		this.createdAt = createdAt
+	}
+
+	static fromResponse(resp) {
+		// noinspection JSUnresolvedReference
+		return new Comment(
+			resp.comment_uuid,
+			resp.post_uuid,
+			resp.author_uuid,
+			resp.comment,
+			resp.created_at,
+		)
+	}
+}
+
+export {User, Post, Comment}
