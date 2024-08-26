@@ -438,18 +438,8 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
-	// Delete post's comments
-	err = rt.db.DeletePostComments(postUUID)
-
-	if err == nil {
-		// Delete post's likes
-		err = rt.db.DeletePostLikes(postUUID)
-	}
-
-	if err == nil {
-		// Delete post
-		err = rt.db.DeletePost(postUUID)
-	}
+	// Delete post
+	err = rt.db.DeletePost(postUUID, nil)
 
 	if err != nil {
 

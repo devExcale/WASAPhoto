@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"errors"
 	"github.com/gofrs/uuid"
 )
@@ -206,9 +207,37 @@ func (db *appdbimpl) SetPost(post *Post, image []byte) error {
 	return err
 }
 
-func (db *appdbimpl) DeletePost(uuid string) error {
+func (db *appdbimpl) DeletePost(uuid string, tx *sql.Tx) error {
 
-	_, err := db.c.Exec(qDeletePost, uuid)
+	var err error
+
+	// Init transaction if null
+	if tx == nil {
+
+		tx, err = db.c.Begin()
+		if err == nil {
+
+			// Commit or rollback new transaction
+			defer func() {
+				if err == nil {
+					err = tx.Commit()
+				} else {
+					_ = tx.Rollback()
+				}
+			}()
+
+		}
+	}
+
+	// Delete all comments
+	if err == nil {
+		_, err = tx.Exec(qDeletePostComments, uuid)
+	}
+
+	// Delete all likes
+	if err == nil {
+		_, err = tx.Exec(qDeletePostLikes, uuid)
+	}
 
 	return err
 }

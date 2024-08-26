@@ -78,7 +78,7 @@ type AppDatabase interface {
 	SetPost(post *Post, image []byte) error
 
 	// DeletePost removes the post with the given UUID.
-	DeletePost(postUUID string) error
+	DeletePost(postUUID string, tx *sql.Tx) error
 
 	// IsBanned checks if a user is banned by another user.
 	IsBanned(bannedUUID, issuerUUID string) (bool, error)
