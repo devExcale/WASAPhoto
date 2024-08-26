@@ -25,9 +25,11 @@ type Post struct {
 }
 
 type Comment struct {
-	UUID       string `json:"comment_uuid"`
-	Comment    string `json:"comment"`
-	CreatedAt  string `json:"created_at"`
-	PostUUID   string `json:"post_uuid"`
-	AuthorUUID string `json:"author_uuid"`
+	UUID              string `json:"comment_uuid"`
+	Comment           string `json:"comment"`
+	CreatedAt         string `json:"created_at"`
+	PostUUID          string `json:"post_uuid"`
+	AuthorUUID        string `json:"author_uuid"`
+	AuthorUsername    string `json:"author_username"`
+	AuthorDisplayName string `json:"author_display_name"`
 }

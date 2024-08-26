@@ -16,6 +16,8 @@ func (db *appdbimpl) GetCommentByUUID(commentUUID string) (Comment, error) {
 		&comment.PostUUID,
 		&comment.AuthorUUID,
 		&comment.CreatedAt,
+		&comment.AuthorUsername,
+		&comment.AuthorDisplayName,
 	)
 
 	return comment, err
@@ -41,6 +43,8 @@ func (db *appdbimpl) GetCommentsByPost(postUUID string) ([]Comment, error) {
 			&comment.PostUUID,
 			&comment.AuthorUUID,
 			&comment.CreatedAt,
+			&comment.AuthorUsername,
+			&comment.AuthorDisplayName,
 		)
 
 		if err != nil {

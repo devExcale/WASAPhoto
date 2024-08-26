@@ -107,7 +107,10 @@ export default {
 
 					<ul v-else>
 						<li v-for="comment in this.comments" :key="comment.uuid">
-							<span class="fst-italic fw-bold">{{ comment.authorUuid }}</span> {{ comment.comment }}
+							<span class="fst-italic fw-bold">
+								{{ comment.authorDisplayName || comment.authorUsername || comment.authorUuid }}
+							</span>
+							{{ comment.comment }}
 						</li>
 					</ul>
 

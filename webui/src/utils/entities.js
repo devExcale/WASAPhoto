@@ -81,12 +81,16 @@ class Comment {
 		uuid = '',
 		postUuid = '',
 		authorUuid = '',
+		authorUsername = '',
+		authorDisplayName = '',
 		comment = '',
 		createdAt = null,
 	) {
 		this.uuid = uuid
 		this.postUuid = postUuid
 		this.authorUuid = authorUuid
+		this.authorUsername = authorUsername
+		this.authorDisplayName = authorDisplayName
 		this.comment = comment
 		this.createdAt = createdAt
 	}
@@ -97,6 +101,8 @@ class Comment {
 			resp.comment_uuid,
 			resp.post_uuid,
 			resp.author_uuid,
+			resp.author_username,
+			resp.author_display_name,
 			resp.comment,
 			resp.created_at,
 		)

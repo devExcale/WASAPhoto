@@ -853,10 +853,12 @@ components:
       properties:
         uuid:
           $ref: '#/components/schemas/UUID'
-        username:
-          type: string
-          description: The username of the user who added the comment.
-          example: excale
+        author_uuid:
+          $ref: '#/components/schemas/UUID'
+        author_username:
+          $ref: '#/components/schemas/Username'
+        author_display_name:
+          $ref: '#/components/schemas/DisplayName'
         text:
           type: string
           description: The text of the comment.
@@ -865,6 +867,7 @@ components:
           type: string
           description: The timestamp of the comment, in `YYYY-MM-DD hh:mm:ss` format.
           example: 2021-01-01T00:00:00.000Z
+
 
     CommentList:
       type: array

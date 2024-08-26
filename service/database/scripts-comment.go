@@ -2,28 +2,38 @@ package database
 
 const qSelectCommentByUUID = `
 	SELECT
-		comment_uuid,
-		comment,
-		post_uuid,
-		author_uuid,
-		ts_created
+		c.comment_uuid,
+		c.comment,
+		c.post_uuid,
+		c.author_uuid,
+		c.ts_created,
+		u.username,
+		u.display_name
 	FROM
-		post_comment
+		post_comment c
+	JOIN
+		user u
+		ON c.author_uuid = u.user_uuid
 	WHERE lower(comment_uuid) = lower(?)
-	ORDER BY ts_created DESC
+	ORDER BY c.ts_created DESC
 `
 
 const qSelectCommentsByPost = `
 	SELECT
-		comment_uuid,
-		comment,
-		post_uuid,
-		author_uuid,
-		ts_created
+		c.comment_uuid,
+		c.comment,
+		c.post_uuid,
+		c.author_uuid,
+		c.ts_created,
+		u.username,
+		u.display_name
 	FROM
-		post_comment
+		post_comment c
+	JOIN
+		user u
+		ON c.author_uuid = u.user_uuid
 	WHERE lower(post_uuid) = lower(?)
-	ORDER BY ts_created DESC
+	ORDER BY c.ts_created DESC
 `
 
 const qUpsertComment = `
