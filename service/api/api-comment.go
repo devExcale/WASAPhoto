@@ -196,9 +196,11 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	var comment = database.Comment{
-		PostUUID:   postUUID,
-		AuthorUUID: user.UUID,
-		Comment:    body.Comment,
+		PostUUID:          postUUID,
+		AuthorUUID:        user.UUID,
+		Comment:           body.Comment,
+		AuthorUsername:    user.Username,
+		AuthorDisplayName: user.DisplayName,
 	}
 
 	// Set comment

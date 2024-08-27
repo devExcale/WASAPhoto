@@ -107,6 +107,11 @@ class Comment {
 			resp.created_at,
 		)
 	}
+
+	get authorName() {
+		return this.authorDisplayName || this.authorUsername || this.authorUuid;
+	}
+
 }
 
 export {User, Post, Comment}

@@ -1,6 +1,6 @@
 <script>
 import {Post, Comment} from "@/utils/entities";
-import {axiosConf} from "@/utils/global";
+import {axiosConf, global} from "@/utils/global";
 
 export default {
 	name: "CommentModal",
@@ -8,12 +8,19 @@ export default {
 		return {
 			comments: [],
 			newCommentInput: '',
+			modal: null,
 		}
 	},
 	props: {
 		post: Post,
 	},
 	computed: {
+		global() {
+			return global
+		},
+		modalId() {
+			return `comments-${this.post.uuid}`;
+		},
 	},
 	methods: {
 
@@ -82,15 +89,48 @@ export default {
 			}
 		},
 
+		async deleteComment(uuid) {
+
+			try {
+
+				let url = `/users/${this.post.authorUuid}/feed/${this.post.uuid}/comments/${uuid}`;
+				await this.$axios.delete(url, axiosConf.value);
+
+				this.comments = this.comments.filter(c => c.uuid !== uuid);
+				this.post.numComments--;
+
+			} catch (e) {
+
+				console.warn(e)
+
+				if (e.response && e.response.status === 400) {
+					alert('Could not delete comment. Please try again later.');
+				} else if (e.response && e.response.status === 401) {
+					alert('You are not logged in. Try refreshing the page.');
+				} else if (e.response && e.response.status === 403) {
+					alert('Could not delete comment. You are restricted by the user.');
+				} else if (e.response && e.response.status === 404) {
+					alert('Could not delete comment. The post doesn\'t exist.');
+				} else if (e.response && e.response.status === 500) {
+					alert('Internal Server Error')
+				} else {
+					alert('Could not delete comment. Please try again later. (?)');
+				}
+
+			}
+
+		}
+
 	},
 	mounted() {
 		this.loadComments();
+		this.modal = new bootstrap.Modal('#' + this.modalId, {keyboard: false});
 	}
 }
 </script>
 
 <template>
-	<div class="modal fade" :id="'comments-' + post.uuid" tabindex="-1">
+	<div class="modal fade" :id="modalId" tabindex="-1">
 		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
 			<div class="modal-content">
 
@@ -101,18 +141,29 @@ export default {
 
 				<div class="modal-body">
 
-					<p v-if="this.comments.length === 0" class="text-center h5">
-						No comments yet...
-					</p>
+					<div class="container" v-if="this.comments.length === 0">
+						<hr>
+						<p class="text-center h5">
+							No comments yet...
+						</p>
+						<hr>
+					</div>
 
-					<ul v-else>
-						<li v-for="comment in this.comments" :key="comment.uuid">
-							<span class="fst-italic fw-bold">
-								{{ comment.authorDisplayName || comment.authorUsername || comment.authorUuid }}
-							</span>
-							{{ comment.comment }}
-						</li>
-					</ul>
+					<div class="container p-0 text-start legend" v-else>
+						<div class="row p-2" v-for="comment in this.comments" :key="comment.uuid">
+								<p class="col my-0 mx-1 d-inline">
+									<RouterLink :to="`/profile/${comment.authorUuid}`" class="fst-italic fw-bold"
+												@click.prevent="modal.hide()" ref="routerLinkTag">
+										{{ comment.authorName }}
+									</RouterLink>
+									&gt;
+									<span>{{ comment.comment }}</span>
+								</p>
+								<button type="button" class="btn-close btn-sm mx-3 my-0"
+										@click="deleteComment(comment.uuid)"
+										v-if="comment.authorUuid === global.userUUID"></button>
+						</div>
+					</div>
 
 				</div>
 
@@ -132,5 +183,11 @@ export default {
 </template>
 
 <style scoped>
+.legend .row:nth-of-type(odd) {
+	background-color: azure;
+}
 
+.legend .row:nth-of-type(even) {
+	background: lavender;
+}
 </style>
