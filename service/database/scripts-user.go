@@ -17,23 +17,6 @@ const qSelectUserFullByUUID = `
 	LIMIT 1
 `
 
-const qSelectUserFullByUsername = `
-	SELECT
-		u.user_uuid,
-		u.username,
-		u.display_name,
-		u.picture_url,
-		u.num_posts,
-		u.num_followed,
-		u.num_following,
-		u.ts_created
-	FROM
-		user_full u
-	WHERE
-		u.username = ?
-	LIMIT 1
-`
-
 const qSelectUserBasicByUUID = `
 	SELECT
 		user_uuid,
@@ -76,4 +59,13 @@ const qSelectUsersByUsernameSubstr = `
 	  	AND b.issuer_uuid IS NULL
 		AND u.user_uuid <> ?2
 	LIMIT 1
+`
+
+const qIsUsernameTaken = `
+	SELECT
+		COUNT(*)
+	FROM
+		user
+	WHERE
+		username = ?
 `

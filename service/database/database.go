@@ -39,11 +39,14 @@ import (
 // AppDatabase is the high level interface for the DB.
 type AppDatabase interface {
 
-	// GetUserFull retrieves all user information with the given UUID or Username.
-	GetUserFull(param string, filterBy int) (User, error)
+	// GetUserFull retrieves all user information with the given UUID.
+	GetUserFull(userUUID string) (User, error)
 
 	// GetUserBasic retrieves minimal user information with the given UUID.
 	GetUserBasic(userUUID string) (User, error)
+
+	// IsUsernameAvailable checks if a username is available.
+	IsUsernameAvailable(username string) (bool, error)
 
 	// SetUser adds or updates a user. No need to provide the UUID for new users.
 	// The object passed as parameter will be updated with the inserted data.

@@ -6,26 +6,11 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-const (
-	FilterByUUID = iota
-	FilterByUsername
-)
-
-func (db *appdbimpl) GetUserFull(param string, filterBy int) (User, error) {
+func (db *appdbimpl) GetUserFull(userUUID string) (User, error) {
 
 	var user = User{}
-	var query string
 
-	switch filterBy {
-	case FilterByUUID:
-		query = qSelectUserFullByUUID
-	case FilterByUsername:
-		query = qSelectUserFullByUsername
-	default:
-		return user, errors.New("invalid filterBy value")
-	}
-
-	err := db.c.QueryRow(query, param).Scan(
+	err := db.c.QueryRow(qSelectUserFullByUUID, userUUID).Scan(
 		&user.UUID,
 		&user.Username,
 		&user.DisplayName,
@@ -33,7 +18,8 @@ func (db *appdbimpl) GetUserFull(param string, filterBy int) (User, error) {
 		&user.NPosts,
 		&user.NFollowers,
 		&user.NFollowing,
-		&user.CreatedAt)
+		&user.CreatedAt,
+	)
 
 	return user, err
 }
@@ -185,4 +171,12 @@ func (db *appdbimpl) GetUsersWithUsernameSubstr(substring string, loggedUserUUID
 	}
 
 	return users, nil
+}
+
+func (db *appdbimpl) IsUsernameAvailable(username string) (bool, error) {
+
+	var taken bool
+	var err = db.c.QueryRow(qIsUsernameTaken, username).Scan(&taken)
+
+	return !taken, err
 }

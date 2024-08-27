@@ -47,7 +47,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Find requested user
-	searchedUser, err := rt.db.GetUserFull(userUUID, database.FilterByUUID)
+	searchedUser, err := rt.db.GetUserFull(userUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -134,16 +134,17 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, _ httpr
 	if lenNewUsername > 0 {
 
 		// Check if the username is already taken
-		_, err = rt.db.GetUserFull(newUsername, database.FilterByUsername)
+		var userNotExists bool
+		userNotExists, err = rt.db.IsUsernameAvailable(newUsername)
 
-		if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		if err != nil {
 
 			// Generic error
 			ctx.Logger.WithError(err).Error("cannot get user")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 
-		} else if err == nil {
+		} else if !userNotExists {
 
 			// Username is taken
 			w.WriteHeader(http.StatusConflict)
