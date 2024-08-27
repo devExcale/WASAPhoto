@@ -25,7 +25,7 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -130,7 +130,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -255,7 +255,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var targetUser, err = rt.db.GetUserBasic(targetUUID)
+	var targetUser, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found

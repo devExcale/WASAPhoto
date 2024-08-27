@@ -6,11 +6,11 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func (db *appdbimpl) GetUserFull(userUUID string) (User, error) {
+func (db *appdbimpl) GetUserFull(userUUID, loggedUserUUID string) (User, error) {
 
 	var user = User{}
 
-	err := db.c.QueryRow(qSelectUserFullByUUID, userUUID).Scan(
+	err := db.c.QueryRow(qSelectUserFullByUUID, userUUID, loggedUserUUID).Scan(
 		&user.UUID,
 		&user.Username,
 		&user.DisplayName,
@@ -19,16 +19,33 @@ func (db *appdbimpl) GetUserFull(userUUID string) (User, error) {
 		&user.NFollowers,
 		&user.NFollowing,
 		&user.CreatedAt,
+		&user.LoggedUserFollowed,
+		&user.LoggerUserRestricted,
 	)
 
 	return user, err
 }
 
-func (db *appdbimpl) GetUserBasic(uuid string) (User, error) {
+func (db *appdbimpl) GetUserBasicByUUID(uuid string) (User, error) {
 
 	var user = User{}
 
 	err := db.c.QueryRow(qSelectUserBasicByUUID, uuid).Scan(
+		&user.UUID,
+		&user.Username,
+		&user.DisplayName,
+		&user.PictureURL,
+		&user.CreatedAt,
+	)
+
+	return user, err
+}
+
+func (db *appdbimpl) GetUserBasicByUsername(username string) (User, error) {
+
+	var user = User{}
+
+	err := db.c.QueryRow(qSelectUserBasicByUsername, username).Scan(
 		&user.UUID,
 		&user.Username,
 		&user.DisplayName,

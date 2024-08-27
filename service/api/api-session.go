@@ -1,8 +1,10 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/database"
 	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/util"
@@ -38,14 +40,12 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, _ httprouter.
 
 	}
 
+	// Check if user exists
 	var user database.User
-
-	// Check if the user exists
-	var userNotExists bool
-	userNotExists, err = rt.db.IsUsernameAvailable(username)
+	user, err = rt.db.GetUserBasicByUsername(username)
 
 	// User not found
-	if err == nil && userNotExists {
+	if errors.Is(err, sql.ErrNoRows) {
 
 		// Create user
 		user = database.User{
@@ -108,7 +108,7 @@ func (rt *_router) getAuthorizedUser(r *http.Request) *database.User {
 
 	// Get user
 	var user database.User
-	user, err = rt.db.GetUserBasic(string(uuidByte))
+	user, err = rt.db.GetUserBasicByUUID(string(uuidByte))
 	if err != nil {
 		return nil
 	}
@@ -133,7 +133,7 @@ func (rt *_router) getAuthorizedUserToken(token string) *database.User {
 
 	// Get user
 	var user database.User
-	user, err = rt.db.GetUserBasic(string(uuidByte))
+	user, err = rt.db.GetUserBasicByUUID(string(uuidByte))
 	if err != nil {
 		return nil
 	}

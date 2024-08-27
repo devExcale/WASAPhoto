@@ -47,7 +47,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Find requested user
-	searchedUser, err := rt.db.GetUserFull(userUUID)
+	searchedUser, err := rt.db.GetUserFull(userUUID, loggedUser.UUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found

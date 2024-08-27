@@ -74,7 +74,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -130,7 +130,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found

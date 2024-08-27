@@ -8,6 +8,8 @@ class User {
 		numFollowers = 0,
 		numFollowing = 0,
 		numPosts = 0,
+		loggedUserFollowed = false,
+		loggedUserRestricted = false,
 	) {
 		this.uuid = uuid
 		this.username = username
@@ -17,6 +19,8 @@ class User {
 		this.numFollowers = numFollowers
 		this.numFollowing = numFollowing
 		this.numPosts = numPosts
+		this.loggedUserFollowed = loggedUserFollowed
+		this.loggedUserRestricted = loggedUserRestricted
 	}
 
 	static fromResponse(resp) {
@@ -30,6 +34,8 @@ class User {
 			resp.num_followers,
 			resp.num_following,
 			resp.num_posts,
+			resp.logged_user_followed,
+			resp.logged_user_restricted,
 		)
 	}
 }

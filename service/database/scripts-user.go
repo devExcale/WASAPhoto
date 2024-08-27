@@ -9,11 +9,23 @@ const qSelectUserFullByUUID = `
 		u.num_posts,
 		u.num_followed,
 		u.num_following,
-		u.ts_created
+		u.ts_created,
+		EXISTS(
+			SELECT 1
+			FROM user_followed f
+			WHERE f.followed_uuid = u.user_uuid
+			AND lower(f.follower_uuid) = lower(?2)
+		) AS logged_user_followed,
+		EXISTS(
+			SELECT 1
+			FROM user_banned b
+			WHERE b.banned_uuid = u.user_uuid
+			AND lower(b.issuer_uuid) = lower(?2)
+		) AS logged_user_restricted
 	FROM
 		user_full u
 	WHERE
-		lower(u.user_uuid) = lower(?)
+		lower(u.user_uuid) = lower(?1)
 	LIMIT 1
 `
 
@@ -28,6 +40,20 @@ const qSelectUserBasicByUUID = `
 		user
 	WHERE
 		lower(user_uuid) = lower(?)
+	LIMIT 1
+`
+
+const qSelectUserBasicByUsername = `
+	SELECT
+		user_uuid,
+		username,
+		display_name,
+		picture_url,
+		ts_created
+	FROM
+		user
+	WHERE
+		username = ?
 	LIMIT 1
 `
 

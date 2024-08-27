@@ -77,7 +77,7 @@ func (rt *_router) getUserFeed(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -164,7 +164,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found

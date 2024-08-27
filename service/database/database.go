@@ -40,10 +40,13 @@ import (
 type AppDatabase interface {
 
 	// GetUserFull retrieves all user information with the given UUID.
-	GetUserFull(userUUID string) (User, error)
+	GetUserFull(userUUID, loggedUserUUID string) (User, error)
 
-	// GetUserBasic retrieves minimal user information with the given UUID.
-	GetUserBasic(userUUID string) (User, error)
+	// GetUserBasicByUUID retrieves minimal user information with the given UUID.
+	GetUserBasicByUUID(userUUID string) (User, error)
+
+	// GetUserBasicByUsername retrieves minimal user information with the given username.
+	GetUserBasicByUsername(username string) (User, error)
 
 	// IsUsernameAvailable checks if a username is available.
 	IsUsernameAvailable(username string) (bool, error)

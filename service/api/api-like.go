@@ -25,7 +25,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -130,7 +130,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -211,7 +211,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found

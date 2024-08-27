@@ -14,8 +14,6 @@ export default {
 			profilePictureSrc: global.loadingGifSrc,
 			loading: true,
 			global: global,
-			followStatus: false,
-			restrictStatus: false,
 		}
 	},
 	inject: ['logout'],
@@ -133,7 +131,7 @@ export default {
 
 			this.loading = true;
 
-			if (this.followStatus)
+			if (this.user.loggedUserFollowed)
 				await this.unfollowUser();
 			else
 				await this.followUser();
@@ -147,7 +145,7 @@ export default {
 			try {
 
 				await this.$axios.put(`/me/followed_users/${this.userUUID}`, {}, axiosConf.value);
-				this.followStatus = true;
+				this.user.loggedUserFollowed = true;
 
 				console.log(`User ${this.userUUID} followed.`)
 
@@ -178,7 +176,7 @@ export default {
 			try {
 
 				await this.$axios.delete(`/me/followed_users/${this.userUUID}`, axiosConf.value);
-				this.followStatus = false;
+				this.user.loggedUserFollowed = false;
 
 				console.log(`User ${this.userUUID} unfollowed.`)
 
@@ -209,7 +207,7 @@ export default {
 
 			this.loading = true;
 
-			if (this.restrictStatus)
+			if (this.user.loggedUserRestricted)
 				await this.unrestrictUser();
 			else
 				await this.restrictUser();
@@ -223,7 +221,7 @@ export default {
 			try {
 
 				await this.$axios.put(`/me/banned_users/${this.userUUID}`, {}, axiosConf.value);
-				this.restrictStatus = true;
+				this.user.loggedUserRestricted = true;
 
 				console.log(`User ${this.userUUID} restricted.`)
 
@@ -252,7 +250,7 @@ export default {
 			try {
 
 				await this.$axios.delete(`/me/banned_users/${this.userUUID}`, axiosConf.value);
-				this.restrictStatus = false;
+				this.user.loggedUserRestricted = false;
 
 				console.log(`User ${this.userUUID} restricted.`)
 
@@ -300,11 +298,11 @@ export default {
 		},
 
 		followBtnStr() {
-			return (this.followStatus) ? 'unfollow' : 'follow';
+			return (this.user.loggedUserFollowed) ? 'unfollow' : 'follow';
 		},
 
 		restrictBtnStr() {
-			return (this.restrictStatus) ? 'unrestrict' : 'restrict';
+			return (this.user.loggedUserRestricted) ? 'unrestrict' : 'restrict';
 		},
 
 	}

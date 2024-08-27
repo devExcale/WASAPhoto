@@ -74,7 +74,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
@@ -120,7 +120,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Get given user
 	var targetUUID = ps.ByName("user_uuid")
-	var _, err = rt.db.GetUserBasic(targetUUID)
+	var _, err = rt.db.GetUserBasicByUUID(targetUUID)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		// User not found
