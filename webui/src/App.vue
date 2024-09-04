@@ -49,7 +49,7 @@ export default {
 
 			<div class="row p-3 flex-grow-1 d-flex overflow-scroll">
 				<div class="col d-flex justify-content-center">
-					<RouterView/>
+					<RouterView :key="$route.fullPath"/>
 				</div>
 			</div>
 
