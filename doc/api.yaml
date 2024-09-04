@@ -185,7 +185,7 @@ paths:
           application/json:
             schema:
               type: object
-              description: A json object containing the new username and/or display name.
+              description: Object containing the new username and/or display name.
               properties:
                 username:
                   $ref: '#/components/schemas/Username'
@@ -219,7 +219,7 @@ paths:
           application/json:
             schema:
               type: object
-              description: A json object containing the id of the photo's post.
+              description: Object containing the id of the photo's post.
               required: [ post_uuid ]
               properties:
                 post_uuid:
@@ -410,6 +410,8 @@ paths:
           $ref: '#/components/responses/500-InternalError'
 
   /users/{user_uuid}/feed/:
+    parameters:
+      - $ref: '#/components/parameters/pathUserUUID'
     get:
       operationId: getUserFeed
       summary: Get all user's posts
@@ -622,7 +624,7 @@ paths:
           application/json:
             schema:
               type: object
-              description: A json object containing the username.
+              description: Object containing the username.
               required: [ username ]
               properties:
                 username:
@@ -634,7 +636,7 @@ paths:
             application/json:
               schema:
                 type: object
-                description: A json object containing the session token.
+                description: Object containing the session token.
                 properties:
                   token:
                     type: string
