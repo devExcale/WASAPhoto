@@ -121,7 +121,9 @@ const qDeletePost = `
 	WHERE lower(post_uuid) = lower(?)
 `
 
+/* Commented unused code in case it comes in handy in the future
 const qDeletePostsByUser = `
 	DELETE FROM post
 	WHERE lower(author_uuid) = lower(?)
 `
+*/

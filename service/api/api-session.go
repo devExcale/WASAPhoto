@@ -116,6 +116,7 @@ func (rt *_router) getAuthorizedUser(r *http.Request) *database.User {
 	return &user
 }
 
+/* Commented unused code in case it comes in handy in the future
 // getAuthorizedUserToken returns minimal information about the authenticated user.
 func (rt *_router) getAuthorizedUserToken(token string) *database.User {
 
@@ -140,3 +141,4 @@ func (rt *_router) getAuthorizedUserToken(token string) *database.User {
 
 	return &user
 }
+*/
