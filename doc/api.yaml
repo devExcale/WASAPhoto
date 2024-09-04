@@ -804,11 +804,11 @@ components:
           $ref: '#/components/schemas/UUID'
         author_uuid:
           $ref: '#/components/schemas/UUID'
-        username:
+        author_username:
           $ref: '#/components/schemas/Username'
-        display_name:
+        author_display_name:
           $ref: '#/components/schemas/DisplayName'
-        url_photo:
+        image_url:
           type: string
           description: |-
             The URL of the photo. Note: all photos are encoded with webp format.
