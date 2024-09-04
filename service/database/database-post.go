@@ -239,5 +239,10 @@ func (db *appdbimpl) DeletePost(uuid string, tx *sql.Tx) error {
 		_, err = tx.Exec(qDeletePostLikes, uuid)
 	}
 
+	// Delete all likes
+	if err == nil {
+		_, err = tx.Exec(qDeletePost, uuid)
+	}
+
 	return err
 }
