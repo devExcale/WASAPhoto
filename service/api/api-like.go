@@ -112,7 +112,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 
 	}
 
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
 
 func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

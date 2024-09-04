@@ -177,8 +177,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, _ httpr
 
 	}
 
-	// Write the response
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
 
 func (rt *_router) setMyProfilePicture(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {

@@ -112,7 +112,7 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
 
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -338,7 +338,5 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 
 	}
 
-	// Write the response
-	w.WriteHeader(http.StatusOK)
-
+	// Default Status OK
 }

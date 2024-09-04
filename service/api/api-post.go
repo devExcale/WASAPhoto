@@ -59,7 +59,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, _ httprou
 
 	}
 
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
 
 func (rt *_router) getUserFeed(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -146,7 +146,7 @@ func (rt *_router) getUserFeed(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
 
 func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -241,7 +241,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 
 	}
 
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
 
 func (rt *_router) getPhotoImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -324,7 +324,7 @@ func (rt *_router) getPhotoImage(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	w.Header().Set("Content-Length", strconv.Itoa(len(image)))
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
 
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, _ httprouter.Params, ctx reqcontext.RequestContext) {

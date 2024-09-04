@@ -56,7 +56,7 @@ func (rt *_router) getFollowedUsers(w http.ResponseWriter, r *http.Request, _ ht
 
 	}
 
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -101,8 +101,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	}
 
-	// Write the response
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
 
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -147,7 +146,5 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	}
 
-	// Write the response
-	w.WriteHeader(http.StatusOK)
-
+	// Default Status OK
 }

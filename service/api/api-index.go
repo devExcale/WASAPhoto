@@ -27,5 +27,5 @@ func (rt *_router) getAppInfo(w http.ResponseWriter, _ *http.Request, _ httprout
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	w.WriteHeader(http.StatusOK)
+	// Default Status OK
 }
