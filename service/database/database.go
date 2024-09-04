@@ -59,7 +59,7 @@ type AppDatabase interface {
 	DeleteUser(userUUID string, tx *sql.Tx) error
 
 	// GetUsersWithUsernameSubstr retrieves all users with a username containing the given substring.
-	GetUsersWithUsernameSubstr(substring string, loggedUserUUID string) ([]User, error)
+	GetUsersSubstringLike(substring string, loggedUserUUID string) ([]User, error)
 
 	// GetPost retrieves the post with the given UUID.
 	GetPost(postUUID string) (Post, error)

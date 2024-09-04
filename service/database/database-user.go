@@ -152,12 +152,12 @@ func (db *appdbimpl) DeleteUser(uuid string, tx *sql.Tx) error {
 	return err
 }
 
-func (db *appdbimpl) GetUsersWithUsernameSubstr(substring string, loggedUserUUID string) ([]User, error) {
+func (db *appdbimpl) GetUsersSubstringLike(substring string, loggedUserUUID string) ([]User, error) {
 
 	var users = make([]User, 0)
 
 	// Get users
-	rows, err := db.c.Query(qSelectUsersByUsernameSubstr, substring, loggedUserUUID)
+	rows, err := db.c.Query(qSelectUsersSubstringLike, substring, loggedUserUUID)
 	if err != nil {
 		return users, err
 	}

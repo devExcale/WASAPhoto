@@ -272,7 +272,7 @@ func (rt *_router) findUser(w http.ResponseWriter, r *http.Request, _ httprouter
 
 	// Search users
 	var users []database.User
-	users, err := rt.db.GetUsersWithUsernameSubstr(targetUsername, loggedUser.UUID)
+	users, err := rt.db.GetUsersSubstringLike(targetUsername, loggedUser.UUID)
 	if err != nil {
 
 		// Generic error
