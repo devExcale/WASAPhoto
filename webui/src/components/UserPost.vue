@@ -115,10 +115,6 @@ export default {
 
 		},
 
-		commentPost() {
-			console.log('commentPost');
-		},
-
 		async deletePost() {
 
 			try {
@@ -191,16 +187,17 @@ export default {
 <template>
 	<div class="card p-0 m-0" :key="post.uuid">
 
-		<img :src="pictureSrc" class="card-img-top" alt="Picture here...">
+		<div class="card-header bg-dark rounded-2 p-0" style="max-height: 50vh;">
+			<img :src="pictureSrc" class="mx-auto d-block rounded-2" alt="Picture here..." style="max-height: 100%; max-width: 100%; aspect-ratio: auto;">
+		</div>
+
 		<div class="card-body">
 
-
-			<RouterLink :to="`/profile/${post.authorUuid}`" class="link-primary">
+			<RouterLink :to="`/profile/${post.authorUuid}`" class="h5 m-0 mb-1 text-decoration-none">
 				{{ post.authorDisplayName || post.authorUsername || post.authorUuid }}
 			</RouterLink>
-			<span class="card-title"></span>
-			<span class="card-subtitle mb-2 text-body-secondary">{{ post.timestamp }}</span>
-			<p class="card-text">{{ post.caption }}</p>
+			<p class="card-subtitle text-body-secondary text-secondary small">{{ post.timestamp }}</p>
+			<p class="card-text mt-2 mb-3" style="white-space: pre;">{{ post.caption }}</p>
 
 			<div class="btn-group">
 				<button :class="likeBtnStyle" class="btn material-symbols-rounded" @click="likePostAction">favorite</button>
