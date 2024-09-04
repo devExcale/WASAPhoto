@@ -320,18 +320,24 @@ export default {
 
 		<div class="row d-flex">
 
-			<img v-if="this.profilePictureSrc"
-				 :src="this.profilePictureSrc"
-				 @set-profile-picture="src => reloadProfilePicture(src)"
-				 class="img-thumbnail col text-center" alt="User picture here...">
+			<div class="col-auto mx-auto" v-if="this.profilePictureSrc">
+				<img :src="this.profilePictureSrc"
+					 @set-profile-picture="src => reloadProfilePicture(src)"
+					 class="text-center border rounded-circle"
+					 style="width: 12em; height: 12em; object-fit: cover;"
+					 alt="User picture here...">
+			</div>
 
 			<div v-else class="col text-center">
 				<p>Select an image from your profile to show it here!</p>
 			</div>
 
-			<div class="row flex-column col">
-				<span class="fw-bold">{{ user.displayName }}</span>
-				<span class="fst-italic">{{ user.username }}</span>
+			<div class="row flex-column col h-100 w-100">
+				<div class="my-auto">
+					<span class="d-block h3 m-0">{{ user.displayName }}</span>
+					<span class="d-block h5 fst-italic mb-3 text-secondary">@{{ user.username }}</span>
+					<span class="d-block small">Member since {{ user.memberSince }}</span>
+				</div>
 			</div>
 
 		</div>
@@ -351,7 +357,7 @@ export default {
 			</li>
 		</ul>
 
-		<div class="row mt-3" v-if="!isLoggedUser">
+		<div class="row mt-3 m-0" v-if="!isLoggedUser">
 			<!-- Actions on other users -->
 			<nav class="nav nav-pills nav-fill justify-content-around">
 				<button :class="disableOnLoad" class="nav-link active m-1" @click="followAction">
@@ -364,17 +370,17 @@ export default {
 		</div>
 
 		<!-- Actions on logged user -->
-		<div class="row" v-else>
+		<div class="row m-0" v-else>
 
-			<nav class="nav nav-pills nav-fill justify-content-around mt-3">
-				<button class="btn btn-primary nav-link active m-1" type="button" :class="disableOnLoad"
+			<nav class="row justify-content-around mt-3 w-100">
+				<button class="col btn btn-primary m-1" type="button" :class="disableOnLoad"
 						data-bs-toggle="modal" data-bs-target="#userSettingsModal">
 					Options
 				</button>
-				<RouterLink to="/follows" class="nav-link active m-1">
+				<RouterLink to="/follows" class="col btn btn-primary m-1">
 					Followed Users
 				</RouterLink>
-				<RouterLink to="/restricts" class="nav-link active m-1">
+				<RouterLink to="/restricts" class="col btn btn-primary m-1">
 					Restricted Users
 				</RouterLink>
 			</nav>
