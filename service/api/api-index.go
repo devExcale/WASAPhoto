@@ -12,7 +12,7 @@ type AppInfo struct {
 	Status  string `json:"status"`
 }
 
-func (rt *_router) getAppInfo(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+func (rt *_router) getStatus(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 
 	info := AppInfo{

@@ -11,7 +11,7 @@ func (rt *_router) Handler() http.Handler {
 	var r = rt.router
 
 	// Generic routes
-	r.GET("/status", rt.getAppInfo)
+	r.GET("/status", rt.getStatus)
 
 	// Login routes
 	r.POST("/session", rt.wrap(rt.doLogin))

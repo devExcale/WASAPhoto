@@ -155,7 +155,7 @@ paths:
 
   /me:
     delete:
-      operationId: deleteProfile
+      operationId: deleteSelfUser
       summary: Delete the user's profile
       description: Delete the user's profile and all related data.
       tags: [ 'User' ]
